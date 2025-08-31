@@ -1,16 +1,18 @@
-import { useState, useEffect, useRef } from "react";
-import Peer, { DataConnection } from "peerjs";
+import "./App.css";
+
 import {
   Character,
-  GameState,
   GamePhase,
+  GameState,
   PeerData,
   SuperheroApiCharacter,
 } from "./types";
+import Peer, { DataConnection } from "peerjs";
+import { useEffect, useRef, useState } from "react";
+
 import Button from "./components/Button";
 import CharacterCard from "./components/CharacterCard";
 import SecretCharacter from "./components/SecretCharacter";
-import "./App.css";
 
 function App() {
   const [gamePhase, setGamePhase] = useState<GamePhase>("menu");
@@ -29,7 +31,7 @@ function App() {
   const fetchCharacters = async (): Promise<Character[]> => {
     try {
       const response = await fetch(
-        "https://akabab.github.io/superhero-api/api/all.json",
+        "https://akabab.github.io/superhero-api/api/all.json"
       );
       const data: SuperheroApiCharacter[] = await response.json();
 
@@ -45,7 +47,7 @@ function App() {
 
       return selected;
     } catch (error) {
-      console.debug("Error fetching characters:", error);
+      console.error("Error fetching characters:", error);
       return [];
     }
   };
@@ -60,85 +62,193 @@ function App() {
   };
 
   const initializeGame = async () => {
+    console.log("Initializing game...");
     const characters = await fetchCharacters();
     if (characters.length === 0) return;
 
     const hostSecret =
       characters[Math.floor(Math.random() * characters.length)];
-    const guestSecret = characters.filter((c) => c.id !== hostSecret.id)[
-      Math.floor(Math.random() * (characters.length - 1))
-    ];
+    const guestSecretOptions = characters.filter((c) => c.id !== hostSecret.id);
+    const guestSecret =
+      guestSecretOptions[Math.floor(Math.random() * guestSecretOptions.length)];
 
     const hostChars = shuffleArray(characters);
     const guestChars = shuffleArray(characters);
 
-    if (isHost) {
-      setGameState({
-        characters: hostChars,
-        mySecret: guestSecret,
-        crossedOut: new Set(),
-      });
+    // Set host's game state
+    setGameState({
+      characters: hostChars,
+      mySecret: guestSecret,
+      crossedOut: new Set(),
+    });
 
-      if (connectionRef.current) {
-        connectionRef.current.send({
-          type: "gameStart",
-          characters: guestChars,
-          secret: hostSecret,
-        });
-      }
+    // Send guest's game data
+    if (connectionRef.current) {
+      connectionRef.current.send({
+        type: "gameStart",
+        characters: guestChars,
+        secret: hostSecret,
+      });
+      console.log("Game data sent to guest");
     }
 
     setGamePhase("playing");
   };
 
-  const createRoom = async () => {
-    const peer = new Peer();
+  const createRoom = () => {
+    console.log("Creating room...");
+
+    // Create peer with explicit config
+    const peer = new Peer({
+      config: {
+        iceServers: [
+          { urls: "stun:stun.l.google.com:19302" },
+          { urls: "stun:stun1.l.google.com:19302" },
+        ],
+      },
+      debug: 3, // Enable full debug logging
+    });
     peerRef.current = peer;
     setIsHost(true);
 
     peer.on("open", (id) => {
+      console.log("Room created with ID:", id);
       setRoomCode(id);
       setGamePhase("waiting");
     });
 
     peer.on("connection", (conn) => {
+      console.log("Incoming connection from:", conn.peer);
       connectionRef.current = conn;
-      conn.on("data", handlePeerData);
-      initializeGame();
+
+      // Set up data handler BEFORE open event
+      conn.on("data", (data) => {
+        console.log("Host received data:", data);
+        handlePeerData(data);
+      });
+
+      conn.on("open", () => {
+        console.log("Connection opened with guest");
+        // Initialize game when connection is ready
+        initializeGame();
+      });
+
+      conn.on("close", () => {
+        console.log("Guest disconnected");
+        alert("Player disconnected");
+        setGamePhase("menu");
+      });
+
+      conn.on("error", (err) => {
+        console.error("Connection error:", err);
+      });
+    });
+
+    peer.on("error", (err) => {
+      console.error("Peer error:", err);
+      if (err.type === "network") {
+        alert("Network error. Please check your connection.");
+      }
     });
   };
 
   const joinRoom = () => {
-    if (!inputCode.trim()) return;
+    if (!inputCode.trim()) {
+      alert("Please enter a room code");
+      return;
+    }
 
-    const peer = new Peer();
+    console.log("Joining room:", inputCode);
+
+    const peer = new Peer({
+      config: {
+        iceServers: [
+          { urls: "stun:stun.l.google.com:19302" },
+          { urls: "stun:stun1.l.google.com:19302" },
+        ],
+      },
+      debug: 3, // Enable full debug logging
+    });
     peerRef.current = peer;
     setIsHost(false);
 
-    peer.on("open", () => {
+    peer.on("open", (id) => {
+      console.log("My peer ID:", id);
+      console.log("Connecting to host:", inputCode);
+
       const conn = peer.connect(inputCode);
       connectionRef.current = conn;
 
-      conn.on("data", handlePeerData);
-      conn.on("open", () => {
-        setGamePhase("waiting");
+      // Set up data handler BEFORE open event
+      conn.on("data", (data) => {
+        console.log("Guest received data:", data);
+        handlePeerData(data);
       });
+
+      conn.on("open", () => {
+        console.log("Connected to host!");
+        setGamePhase("waiting");
+        conn.send({ type: "ready" }); // Send ready signal
+      });
+
+      conn.on("error", (err) => {
+        console.error("Connection error:", err);
+        alert("Failed to connect. Check the room code and try again.");
+        setGamePhase("menu");
+      });
+
+      conn.on("close", () => {
+        console.log("Disconnected from host");
+        alert("Disconnected from host");
+        setGamePhase("menu");
+      });
+    });
+
+    peer.on("error", (err) => {
+      console.error("Peer error:", err);
+      if (err.type === "peer-unavailable") {
+        alert("Room not found. Please check the code.");
+        setGamePhase("menu");
+      } else if (err.type === "network") {
+        alert("Network error. Please check your connection.");
+        setGamePhase("menu");
+      }
     });
   };
 
-  const handlePeerData = (data: PeerData) => {
-    if (data.type === "gameStart" && data.characters && data.secret) {
-      setGameState({
-        characters: data.characters,
-        mySecret: data.secret,
-        crossedOut: new Set(),
-      });
-      setGamePhase("playing");
-    } else if (data.type === "crossOut" && data.crossedOut) {
-      setGameState((prev) => ({
-        ...prev,
-        crossedOut: new Set(data.crossedOut),
-      }));
+  function assertPeerData(data: unknown): asserts data is PeerData {
+    if (typeof data !== "object" || data === null) {
+      throw new Error("Invalid peer data");
+    }
+    if (!("type" in data)) {
+      throw new Error("Missing type in peer data");
+    }
+  }
+
+  const handlePeerData = (data: unknown) => {
+    try {
+      assertPeerData(data);
+      console.log("Processing data of type:", data.type);
+
+      if (data.type === "gameStart" && data.characters && data.secret) {
+        console.log("Starting game with", data.characters.length, "characters");
+        setGameState({
+          characters: data.characters,
+          mySecret: data.secret,
+          crossedOut: new Set(),
+        });
+        setGamePhase("playing");
+      } else if (data.type === "crossOut" && data.crossedOut) {
+        console.log("Updating crossed out characters");
+        setGameState((prev) => ({
+          ...prev,
+          crossedOut: new Set(data.crossedOut),
+        }));
+      } else if (data.type === "ready") {
+        console.log("Guest is ready");
+      }
+    } catch (error) {
+      console.error("Error handling peer data:", error);
     }
   };
 
@@ -167,36 +277,14 @@ function App() {
 
   const resetGame = async () => {
     if (!isHost) return;
-
-    const characters = await fetchCharacters();
-    if (characters.length === 0) return;
-
-    const hostSecret =
-      characters[Math.floor(Math.random() * characters.length)];
-    const guestSecret = characters.filter((c) => c.id !== hostSecret.id)[
-      Math.floor(Math.random() * (characters.length - 1))
-    ];
-
-    const hostChars = shuffleArray(characters);
-    const guestChars = shuffleArray(characters);
-
-    setGameState({
-      characters: hostChars,
-      mySecret: guestSecret,
-      crossedOut: new Set(),
-    });
-
-    if (connectionRef.current) {
-      connectionRef.current.send({
-        type: "gameStart",
-        characters: guestChars,
-        secret: hostSecret,
-      });
-    }
+    await initializeGame();
   };
 
   useEffect(() => {
     return () => {
+      if (connectionRef.current) {
+        connectionRef.current.close();
+      }
       if (peerRef.current) {
         peerRef.current.destroy();
       }
@@ -217,6 +305,7 @@ function App() {
               placeholder="Enter room code"
               value={inputCode}
               onChange={(e) => setInputCode(e.target.value)}
+              onKeyPress={(e) => e.key === "Enter" && joinRoom()}
               className="code-input"
             />
             <Button onClick={joinRoom} variant="join">
@@ -240,7 +329,7 @@ function App() {
               <p>Waiting for player to join...</p>
             </>
           ) : (
-            <p>Connecting...</p>
+            <p>Connected! Waiting for game to start...</p>
           )}
         </div>
       </div>
