@@ -44,14 +44,18 @@ body {
 }
 
 .code-input {
-  padding: 15px 25px;
-  font-size: 16px;
+  padding: 1rem 1.5rem;
+  font-size: 1rem;
   border: none;
   border-radius: 25px;
-  background: rgba(255, 255, 255, 0.9);
+  background: rgba(255, 255, 255, 0.95);
   text-align: center;
-  width: 300px;
-  transition: all 0.3s ease;
+  width: 18.75rem;
+  color: #333;
+  letter-spacing: 2px;
+  transition:
+    box-shadow 0.3s,
+    transform 0.3s;
 }
 
 .code-input:focus {
