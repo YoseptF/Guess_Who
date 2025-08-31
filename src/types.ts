@@ -7,7 +7,8 @@ export interface Character {
 export interface GameState {
   characters: Character[];
   mySecret: Character | null;
-  crossedOut: Set<number>;
+  myCrossedOut: Set<number>;
+  opponentCrossedOut: Set<number>;
 }
 
 export type GamePhase = "menu" | "waiting" | "playing";

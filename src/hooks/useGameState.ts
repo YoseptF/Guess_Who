@@ -7,7 +7,8 @@ export const useGameState = () => {
   const [gameState, setGameState] = useState<GameState>({
     characters: [],
     mySecret: null,
-    crossedOut: new Set(),
+    myCrossedOut: new Set(),
+    opponentCrossedOut: new Set(),
   });
 
   const { fetchCharacters, shuffleArray } = useCharacters();
@@ -46,7 +47,8 @@ export const useGameState = () => {
       setGameState({
         characters,
         mySecret: secret,
-        crossedOut: new Set(),
+        myCrossedOut: new Set(),
+        opponentCrossedOut: new Set(),
       });
     },
     [],
@@ -60,14 +62,15 @@ export const useGameState = () => {
       setGameState({
         characters: data.characters,
         mySecret: data.secret,
-        crossedOut: new Set(),
+        myCrossedOut: new Set(),
+        opponentCrossedOut: new Set(),
       });
       return true;
     } else if (data.type === "crossOut" && data.crossedOut) {
-      console.debug("Updating crossed out characters");
+      console.debug("Updating opponent's crossed out characters");
       setGameState((prev) => ({
         ...prev,
-        crossedOut: new Set(data.crossedOut),
+        opponentCrossedOut: new Set(data.crossedOut),
       }));
       return true;
     } else if (data.type === "ready") {
@@ -81,23 +84,23 @@ export const useGameState = () => {
   const toggleCrossOut = useCallback(
     (characterId: number, onSendData?: (data: PeerData) => void) => {
       setGameState((prev) => {
-        const newCrossedOut = new Set(prev.crossedOut);
-        if (newCrossedOut.has(characterId)) {
-          newCrossedOut.delete(characterId);
+        const newMyCrossedOut = new Set(prev.myCrossedOut);
+        if (newMyCrossedOut.has(characterId)) {
+          newMyCrossedOut.delete(characterId);
         } else {
-          newCrossedOut.add(characterId);
+          newMyCrossedOut.add(characterId);
         }
 
         if (onSendData) {
           onSendData({
             type: "crossOut",
-            crossedOut: Array.from(newCrossedOut),
+            crossedOut: Array.from(newMyCrossedOut),
           });
         }
 
         return {
           ...prev,
-          crossedOut: newCrossedOut,
+          myCrossedOut: newMyCrossedOut,
         };
       });
     },
@@ -108,7 +111,8 @@ export const useGameState = () => {
     setGameState({
       characters: [],
       mySecret: null,
-      crossedOut: new Set(),
+      myCrossedOut: new Set(),
+      opponentCrossedOut: new Set(),
     });
   }, []);
 

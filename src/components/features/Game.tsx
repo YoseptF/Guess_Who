@@ -34,7 +34,7 @@ export default function Game({
           <CharacterCard
             key={character.id}
             character={character}
-            isCrossedOut={gameState.crossedOut.has(character.id)}
+            isCrossedOut={gameState.myCrossedOut.has(character.id)}
             onClick={() => onCharacterClick(character.id)}
           />
         ))}
