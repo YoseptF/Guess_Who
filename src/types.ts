@@ -29,3 +29,12 @@ export interface SuperheroApiCharacter {
     lg?: string;
   };
 }
+
+export interface CharacterProvider {
+  name: string;
+  fetchCharacters(): Promise<Character[]>;
+}
+
+export interface CharacterSourceSettings {
+  [key: string]: boolean;
+}

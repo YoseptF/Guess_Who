@@ -1,30 +1,45 @@
 import { useCallback } from "react";
-import type { Character, SuperheroApiCharacter } from "../types";
+import type { Character } from "../types";
+import { characterProviders, getProviderByName } from "../providers";
 
 export const useCharacters = () => {
-  const fetchCharacters = useCallback(async (): Promise<Character[]> => {
-    try {
-      const response = await fetch(
-        "https://akabab.github.io/superhero-api/api/all.json",
-      );
-      const data: SuperheroApiCharacter[] = await response.json();
+  const fetchCharacters = useCallback(
+    async (enabledSources?: string[]): Promise<Character[]> => {
+      const sourcesToUse =
+        enabledSources && enabledSources.length > 0
+          ? enabledSources
+          : characterProviders.map((p) => p.name);
 
-      const selected = data
-        .filter((char) => char.images?.sm)
+      const allCharacters: Character[] = [];
+      let globalIndex = 0;
+
+      for (const sourceName of sourcesToUse) {
+        const provider = getProviderByName(sourceName);
+        if (provider) {
+          try {
+            const characters = await provider.fetchCharacters();
+            const reindexedCharacters = characters.map((char) => ({
+              ...char,
+              id: globalIndex++,
+            }));
+            allCharacters.push(...reindexedCharacters);
+          } catch (error) {
+            console.error(
+              `Error fetching characters from ${sourceName}:`,
+              error,
+            );
+          }
+        }
+      }
+
+      const shuffled = allCharacters
         .sort(() => Math.random() - 0.5)
-        .slice(0, 24)
-        .map((char, index) => ({
-          id: index,
-          name: char.name,
-          image: char.images.sm!,
-        }));
+        .slice(0, 24);
 
-      return selected;
-    } catch (error) {
-      console.error("Error fetching characters:", error);
-      return [];
-    }
-  }, []);
+      return shuffled;
+    },
+    [],
+  );
 
   const shuffleArray = useCallback(<T>(array: T[]): T[] => {
     const shuffled = [...array];
