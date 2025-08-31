@@ -1,4 +1,4 @@
-import { GameState } from "../types";
+import { GameState } from "../../types";
 import Button from "../ui/Button";
 import CharacterCard from "../ui/CharacterCard";
 import SecretCharacter from "../ui/SecretCharacter";
