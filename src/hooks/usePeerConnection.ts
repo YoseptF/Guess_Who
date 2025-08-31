@@ -1,13 +1,20 @@
-import { useRef, useCallback } from "react";
 import Peer, { DataConnection } from "peerjs";
+import { useCallback, useRef } from "react";
+
 import type { PeerData } from "../types";
+import { humanId } from "human-id";
+
+const ID = humanId({
+  separator: "-",
+  capitalize: false,
+});
 
 export const usePeerConnection = () => {
   const peerRef = useRef<Peer | null>(null);
   const connectionRef = useRef<DataConnection | null>(null);
 
   const assertPeerData: (data: unknown) => asserts data is PeerData = (
-    data: unknown,
+    data: unknown
   ): asserts data is PeerData => {
     if (typeof data !== "object" || data === null) {
       throw new Error("Invalid peer data");
@@ -18,7 +25,7 @@ export const usePeerConnection = () => {
   };
 
   const createPeer = useCallback(() => {
-    return new Peer({
+    return new Peer(ID, {
       config: {
         iceServers: [
           { urls: "stun:stun.l.google.com:19302" },
@@ -35,7 +42,7 @@ export const usePeerConnection = () => {
       onConnectionEstablished: () => void,
       onDataReceived: (data: PeerData) => void,
       onDisconnect: () => void,
-      onError: (error: Error) => void,
+      onError: (error: Error) => void
     ) => {
       console.debug("Creating room...");
 
@@ -82,7 +89,7 @@ export const usePeerConnection = () => {
         onError(err);
       });
     },
-    [createPeer],
+    [createPeer]
   );
 
   const joinRoom = useCallback(
@@ -91,7 +98,7 @@ export const usePeerConnection = () => {
       onConnected: () => void,
       onDataReceived: (data: PeerData) => void,
       onDisconnect: () => void,
-      onError: (error: Error) => void,
+      onError: (error: Error) => void
     ) => {
       console.debug("Joining room:", roomCode);
 
@@ -137,7 +144,7 @@ export const usePeerConnection = () => {
         onError(err);
       });
     },
-    [createPeer],
+    [createPeer]
   );
 
   const sendData = useCallback((data: PeerData) => {
