@@ -1,4 +1,6 @@
 import Button from "../ui/Button";
+import CharacterSettings from "../ui/CharacterSettings";
+import { useState } from "react";
 
 interface MenuProps {
   inputCode: string;
@@ -13,6 +15,7 @@ export default function Menu({
   onCreateRoom,
   onJoinRoom,
 }: MenuProps) {
+  const [showSettings, setShowSettings] = useState(false);
   const handleKeyPress = (e: React.KeyboardEvent) => {
     if (e.key === "Enter") {
       onJoinRoom();
@@ -38,6 +41,12 @@ export default function Menu({
           <Button onClick={onJoinRoom} variant="join">
             Join Room
           </Button>
+        </div>
+        <div className="settings-section">
+          <Button onClick={() => setShowSettings(!showSettings)} variant="join">
+            {showSettings ? "Hide Settings" : "Settings"}
+          </Button>
+          {showSettings && <CharacterSettings />}
         </div>
       </div>
     </div>

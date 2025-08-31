@@ -1,6 +1,7 @@
 import { useState, useCallback } from "react";
 import type { Character, GameState, PeerData } from "../types";
 import { useCharacters } from "./useCharacters";
+import { useSettings } from "../contexts/SettingsContext";
 
 export const useGameState = () => {
   const [gameState, setGameState] = useState<GameState>({
@@ -10,6 +11,7 @@ export const useGameState = () => {
   });
 
   const { fetchCharacters, shuffleArray } = useCharacters();
+  const { getEnabledSources } = useSettings();
 
   const initializeGame = useCallback(async (): Promise<{
     hostChars: Character[];
@@ -18,7 +20,8 @@ export const useGameState = () => {
     guestSecret: Character;
   } | null> => {
     console.debug("Initializing game...");
-    const characters = await fetchCharacters();
+    const enabledSources = getEnabledSources();
+    const characters = await fetchCharacters(enabledSources);
     if (characters.length === 0) return null;
 
     const hostSecret =
@@ -36,7 +39,7 @@ export const useGameState = () => {
       hostSecret,
       guestSecret,
     };
-  }, [fetchCharacters, shuffleArray]);
+  }, [fetchCharacters, shuffleArray, getEnabledSources]);
 
   const setGameAsHost = useCallback(
     (characters: Character[], secret: Character) => {
