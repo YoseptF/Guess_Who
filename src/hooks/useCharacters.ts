@@ -1,5 +1,5 @@
 import { useCallback } from "react";
-import { Character, SuperheroApiCharacter } from "../types";
+import type { Character, SuperheroApiCharacter } from "../types";
 
 export const useCharacters = () => {
   const fetchCharacters = useCallback(async (): Promise<Character[]> => {

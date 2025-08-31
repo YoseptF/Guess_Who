@@ -1,12 +1,14 @@
 import { useRef, useCallback } from "react";
 import Peer, { DataConnection } from "peerjs";
-import { PeerData } from "../types";
+import type { PeerData } from "../types";
 
 export const usePeerConnection = () => {
   const peerRef = useRef<Peer | null>(null);
   const connectionRef = useRef<DataConnection | null>(null);
 
-  const assertPeerData = (data: unknown): asserts data is PeerData => {
+  const assertPeerData: (data: unknown) => asserts data is PeerData = (
+    data: unknown,
+  ): asserts data is PeerData => {
     if (typeof data !== "object" || data === null) {
       throw new Error("Invalid peer data");
     }

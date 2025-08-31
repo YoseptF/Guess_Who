@@ -13,7 +13,7 @@ export interface GameState {
 export type GamePhase = "menu" | "waiting" | "playing";
 
 export interface PeerData {
-  type: "gameStart" | "crossOut";
+  type: "gameStart" | "crossOut" | "ready";
   characters?: Character[];
   secret?: Character;
   crossedOut?: number[];

@@ -1,5 +1,5 @@
 import { useState, useCallback } from "react";
-import { Character, GameState, PeerData } from "../types";
+import type { Character, GameState, PeerData } from "../types";
 import { useCharacters } from "./useCharacters";
 
 export const useGameState = () => {
