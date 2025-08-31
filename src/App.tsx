@@ -15,6 +15,14 @@ function App() {
   const [inputCode, setInputCode] = useState("");
   const [isHost, setIsHost] = useState(false);
 
+  useEffect(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const roomCodeFromUrl = urlParams.get("roomCode");
+    if (roomCodeFromUrl) {
+      setInputCode(roomCodeFromUrl);
+    }
+  }, []);
+
   const { createRoom, joinRoom, sendData, cleanup } = usePeerConnection();
   const {
     gameState,
