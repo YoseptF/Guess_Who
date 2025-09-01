@@ -28,7 +28,7 @@ export default function Menu({
       <h1>Guess Who?</h1>
       <div className="menu">
         <div className="flex items-center gap-3">
-          <Button onClick={onCreateRoom} variant="create">
+          <Button onClick={onCreateRoom} variant="outline">
             Create Room
           </Button>
           <SettingsDropdown />

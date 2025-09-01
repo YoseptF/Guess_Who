@@ -4,6 +4,7 @@ import type { GameState } from "../../types";
 import SecretCharacter from "../ui/SecretCharacter";
 import SettingsDropdown from "../ui/SettingsDropdown";
 import WinsDropdown from "../ui/WinsDropdown";
+import PlayerNames from "../ui/PlayerNames";
 import { useState } from "react";
 
 interface GameProps {
@@ -114,25 +115,13 @@ export default function Game({
         )}
       </div>
 
-      <div className="player-names flex justify-between items-center mb-4 px-4">
-        <div className="my-name flex items-center gap-2">
-          <span className="text-sm text-gray-600">You: </span>
-          <EditablePlayerName
-            name={gameState.myName}
-            onNameChange={onNameUpdate}
-          />
-          <span className="text-xs bg-blue-100 px-2 py-1 rounded">
-            {gameState.myWins} wins
-          </span>
-        </div>
-        <div className="opponent-name flex items-center gap-2">
-          <span className="text-sm text-gray-600">Opponent: </span>
-          <span className="font-medium">{gameState.opponentName}</span>
-          <span className="text-xs bg-red-100 px-2 py-1 rounded">
-            {gameState.opponentWins} wins
-          </span>
-        </div>
-      </div>
+      <PlayerNames
+        myName={gameState.myName}
+        opponentName={gameState.opponentName}
+        myWins={gameState.myWins}
+        opponentWins={gameState.opponentWins}
+        onNameChange={onNameUpdate}
+      />
 
       {gameState.mySecret && <SecretCharacter character={gameState.mySecret} />}
 
