@@ -373,3 +373,15 @@ button:not([data-slot="button"]):focus-visible {
     @apply text-3xl;
   }
 }
+
+@media (orientation: portrait) {
+  .character-grid {
+    @apply grid-cols-3 gap-2;
+  }
+}
+
+@media (max-width: 480px) and (orientation: portrait) {
+  .character-grid {
+    @apply grid-cols-3 gap-1.5;
+  }
+}
