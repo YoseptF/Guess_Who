@@ -6,6 +6,14 @@ import Waiting from "./components/features/Waiting";
 import Game from "./components/features/Game";
 import { usePeerConnection } from "./hooks/usePeerConnection";
 import { useGameState } from "./hooks/useGameState";
+import { getRoomCodeFromUrl } from "./lib/utils";
+import {
+  createGameInitializationHandler,
+  createRoomCreationHandler,
+  createRoomJoiningHandler,
+  createCharacterClickHandler,
+  createGameResetHandler,
+} from "./lib/gameHandlers";
 
 function App() {
   const [gamePhase, setGamePhase] = useState<GamePhase>("menu");
@@ -14,8 +22,7 @@ function App() {
   const [isHost, setIsHost] = useState(false);
 
   useEffect(() => {
-    const urlParams = new URLSearchParams(window.location.search);
-    const roomCodeFromUrl = urlParams.get("roomCode");
+    const roomCodeFromUrl = getRoomCodeFromUrl();
     if (roomCodeFromUrl) {
       setInputCode(roomCodeFromUrl);
     }
@@ -31,95 +38,30 @@ function App() {
     resetGameState,
   } = useGameState();
 
-  const handleGameInitialization = async () => {
-    const gameData = await initializeGame();
-    if (!gameData) return;
-
-    const { hostChars, guestChars, hostSecret, guestSecret } = gameData;
-
-    setGameAsHost(hostChars, guestSecret);
-
-    sendData({
-      type: "gameStart",
-      characters: guestChars,
-      secret: hostSecret,
-    });
-    console.debug("Game data sent to guest");
-
-    setGamePhase("playing");
+  const gameHandlers = {
+    sendData,
+    setGameAsHost,
+    initializeGame,
+    setGamePhase,
+    handlePeerData,
+    resetGameState,
+    toggleCrossOut,
+    setIsHost,
+    setRoomCode,
+    createRoom,
+    joinRoom,
   };
 
-  const handleCreateRoom = () => {
-    setIsHost(true);
-    createRoom(
-      (id) => {
-        setRoomCode(id);
-        setGamePhase("waiting");
-      },
-      handleGameInitialization,
-      (data: PeerData) => {
-        const handled = handlePeerData(data);
-        if (data.type === "gameStart" && handled) {
-          setGamePhase("playing");
-        }
-      },
-      () => {
-        alert("Player disconnected");
-        setGamePhase("menu");
-        resetGameState();
-      },
-      (error) => {
-        console.error("Connection error:", error);
-        if (error.message.includes("network")) {
-          alert("Network error. Please check your connection.");
-        }
-      },
-    );
-  };
-
-  const handleJoinRoom = () => {
-    if (!inputCode.trim()) {
-      alert("Please enter a room code");
-      return;
-    }
-
-    setIsHost(false);
-    joinRoom(
-      inputCode,
-      () => setGamePhase("waiting"),
-      (data: PeerData) => {
-        const handled = handlePeerData(data);
-        if (data.type === "gameStart" && handled) {
-          setGamePhase("playing");
-        }
-      },
-      () => {
-        alert("Disconnected from host");
-        setGamePhase("menu");
-        resetGameState();
-      },
-      (error) => {
-        console.error("Connection error:", error);
-        if (error.message.includes("peer-unavailable")) {
-          alert("Room not found. Please check the code.");
-        } else if (error.message.includes("network")) {
-          alert("Network error. Please check your connection.");
-        } else {
-          alert("Failed to connect. Check the room code and try again.");
-        }
-        setGamePhase("menu");
-      },
-    );
-  };
-
-  const handleCharacterClick = (characterId: number) => {
-    toggleCrossOut(characterId, sendData);
-  };
-
-  const handleResetGame = async () => {
-    if (!isHost) return;
-    await handleGameInitialization();
-  };
+  const handleGameInitialization =
+    createGameInitializationHandler(gameHandlers);
+  const handleCreateRoom = createRoomCreationHandler(gameHandlers);
+  const handleJoinRoom = () =>
+    createRoomJoiningHandler(gameHandlers)(inputCode);
+  const handleCharacterClick = createCharacterClickHandler(gameHandlers);
+  const handleResetGame = createGameResetHandler(
+    isHost,
+    handleGameInitialization,
+  );
 
   useEffect(() => {
     return cleanup;
