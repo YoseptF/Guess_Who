@@ -1,7 +1,6 @@
 import { Button } from "../ui/Button";
-import CharacterSettings from "../ui/CharacterSettings";
 import { Input } from "../ui/Input";
-import { useState } from "react";
+import SettingsDropdown from "../ui/SettingsDropdown";
 
 interface MenuProps {
   inputCode: string;
@@ -16,7 +15,6 @@ export default function Menu({
   onCreateRoom,
   onJoinRoom,
 }: MenuProps) {
-  const [showSettings, setShowSettings] = useState(false);
   const handleKeyPress = (e: React.KeyboardEvent) => {
     if (e.key === "Enter") {
       onJoinRoom();
@@ -40,12 +38,7 @@ export default function Menu({
           />
           <Button onClick={onJoinRoom}>Join Room</Button>
         </div>
-        <div>
-          <Button onClick={() => setShowSettings(!showSettings)}>
-            {showSettings ? "Hide Settings" : "Settings"}
-          </Button>
-          {showSettings && <CharacterSettings />}
-        </div>
+        <SettingsDropdown buttonText="Settings" showIcon={false} />
       </div>
     </div>
   );
