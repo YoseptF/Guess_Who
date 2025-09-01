@@ -1,5 +1,3 @@
-import "./App.css";
-
 import type { GamePhase, PeerData } from "./types";
 import { useEffect, useState } from "react";
 
