@@ -12,6 +12,7 @@
   "dependencies": {
     "add": "^2.0.6",
     "human-id": "^4.1.1",
+    "lucide-react": "^0.542.0",
     "peerjs": "^1.5.5",
     "qrcode": "^1.5.4",
     "react": "^19.1.1",
