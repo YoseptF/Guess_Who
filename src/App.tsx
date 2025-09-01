@@ -20,6 +20,7 @@ function App() {
   const [roomCode, setRoomCode] = useState("");
   const [inputCode, setInputCode] = useState("");
   const [isHost, setIsHost] = useState(false);
+  const [isJoining, setIsJoining] = useState(false);
 
   useEffect(() => {
     const roomCodeFromUrl = getRoomCodeFromUrl();
@@ -55,8 +56,23 @@ function App() {
   const handleGameInitialization =
     createGameInitializationHandler(gameHandlers);
   const handleCreateRoom = createRoomCreationHandler(gameHandlers);
-  const handleJoinRoom = () =>
-    createRoomJoiningHandler(gameHandlers)(inputCode);
+  const handleJoinRoom = () => {
+    setIsJoining(true);
+    const joinHandler = createRoomJoiningHandler({
+      ...gameHandlers,
+      setGamePhase: (phase: GamePhase) => {
+        setIsJoining(false);
+        setGamePhase(phase);
+      },
+    });
+
+    try {
+      joinHandler(inputCode);
+    } catch (error) {
+      setIsJoining(false);
+      throw error;
+    }
+  };
   const handleCharacterClick = createCharacterClickHandler(gameHandlers);
   const handleResetGame = createGameResetHandler(
     isHost,
@@ -74,6 +90,7 @@ function App() {
         onInputCodeChange={setInputCode}
         onCreateRoom={handleCreateRoom}
         onJoinRoom={handleJoinRoom}
+        isJoining={isJoining}
       />
     );
   }

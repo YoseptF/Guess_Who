@@ -7,6 +7,7 @@ interface MenuProps {
   onInputCodeChange: (code: string) => void;
   onCreateRoom: () => void;
   onJoinRoom: () => void;
+  isJoining: boolean;
 }
 
 export default function Menu({
@@ -14,9 +15,10 @@ export default function Menu({
   onInputCodeChange,
   onCreateRoom,
   onJoinRoom,
+  isJoining,
 }: MenuProps) {
   const handleKeyPress = (e: React.KeyboardEvent) => {
-    if (e.key === "Enter") {
+    if (e.key === "Enter" && !isJoining) {
       onJoinRoom();
     }
   };
@@ -38,8 +40,11 @@ export default function Menu({
             value={inputCode}
             onChange={(e) => onInputCodeChange(e.target.value)}
             onKeyDown={handleKeyPress}
+            disabled={isJoining}
           />
-          <Button onClick={onJoinRoom}>Join Room</Button>
+          <Button onClick={onJoinRoom} loading={isJoining} disabled={isJoining}>
+            Join Room
+          </Button>
         </div>
       </div>
     </div>
