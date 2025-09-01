@@ -1,4 +1,4 @@
-import type { GamePhase, PeerData } from "./types";
+import type { GamePhase } from "./types";
 import { useEffect, useState } from "react";
 
 import Menu from "./components/features/Menu";

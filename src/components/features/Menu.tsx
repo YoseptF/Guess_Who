@@ -1,5 +1,5 @@
 import { Button } from "../ui/Button";
-import { Input } from "../ui/Input";
+import { Input } from "../ui/input";
 import SettingsDropdown from "../ui/SettingsDropdown";
 
 interface MenuProps {
@@ -38,7 +38,9 @@ export default function Menu({
             type="text"
             placeholder="Enter room code"
             value={inputCode}
-            onChange={(e) => onInputCodeChange(e.target.value)}
+            onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+              onInputCodeChange(e.target.value)
+            }
             onKeyDown={handleKeyPress}
             disabled={isJoining}
           />

@@ -68,8 +68,8 @@ export const useGameState = () => {
       console.debug("Starting game with", data.characters.length, "characters");
       setGameState((prev) => ({
         ...prev,
-        characters: data.characters,
-        mySecret: data.secret,
+        characters: data.characters || [],
+        mySecret: data.secret || null,
         myCrossedOut: new Set(),
         opponentCrossedOut: new Set(),
         myName: "Guest",
@@ -80,7 +80,7 @@ export const useGameState = () => {
       console.debug("Updating opponent's name to:", data.name);
       setGameState((prev) => ({
         ...prev,
-        opponentName: data.name,
+        opponentName: data.name || "",
       }));
       return true;
     } else if (data.type === "crossOut" && data.crossedOut) {
