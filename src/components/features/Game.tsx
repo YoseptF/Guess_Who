@@ -1,18 +1,19 @@
-import { Settings } from "lucide-react";
-import type { GameState } from "../../types";
-import { Button } from "../ui/Button";
-import CharacterCard from "../ui/CharacterCard";
-import SecretCharacter from "../ui/SecretCharacter";
 import {
   DropdownMenu,
-  DropdownMenuTrigger,
+  DropdownMenuCheckboxItem,
   DropdownMenuContent,
   DropdownMenuLabel,
   DropdownMenuSeparator,
-  DropdownMenuCheckboxItem,
+  DropdownMenuTrigger,
 } from "../ui/dropdown-menu";
-import { useSettings } from "../../contexts/SettingsContext";
+
+import { Button } from "../ui/Button";
+import CharacterCard from "../ui/CharacterCard";
+import type { GameState } from "../../types";
+import SecretCharacter from "../ui/SecretCharacter";
+import { Settings } from "lucide-react";
 import { characterProviders } from "../../providers";
+import { useSettings } from "../../contexts/SettingsContext";
 
 interface GameProps {
   gameState: GameState;
@@ -34,13 +35,11 @@ export default function Game({
       <div className="game-header">
         <h1>Guess Who?</h1>
         {isHost && (
-          <div className="game-controls">
-            <Button onClick={onResetGame} variant="reset">
-              Reset Game
-            </Button>
+          <div className="game-controls flex items-center gap-3">
+            <Button onClick={onResetGame}>Reset Game</Button>
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="secondary" title="Game Settings">
+                <Button title="Game Settings">
                   <Settings size={16} />
                 </Button>
               </DropdownMenuTrigger>
@@ -54,6 +53,7 @@ export default function Game({
                     onCheckedChange={(checked) =>
                       updateCharacterSource(provider.name, checked)
                     }
+                    onSelect={(event) => event.preventDefault()}
                   >
                     {provider.name}
                   </DropdownMenuCheckboxItem>
