@@ -11,6 +11,8 @@ export interface GameState {
   opponentCrossedOut: Set<number>;
   myName: string;
   opponentName: string;
+  myWins: number;
+  opponentWins: number;
 }
 
 export type GamePhase = "menu" | "waiting" | "playing";

@@ -3,6 +3,7 @@ import CharacterCard from "../ui/CharacterCard";
 import type { GameState } from "../../types";
 import SecretCharacter from "../ui/SecretCharacter";
 import SettingsDropdown from "../ui/SettingsDropdown";
+import WinsDropdown from "../ui/WinsDropdown";
 import { useState } from "react";
 
 interface GameProps {
@@ -11,6 +12,8 @@ interface GameProps {
   onCharacterClick: (characterId: number) => void;
   onResetGame: () => void;
   onNameUpdate: (name: string) => void;
+  onAddWinToMe: () => void;
+  onAddWinToOpponent: () => void;
 }
 
 interface EditablePlayerNameProps {
@@ -90,6 +93,8 @@ export default function Game({
   onCharacterClick,
   onResetGame,
   onNameUpdate,
+  onAddWinToMe,
+  onAddWinToOpponent,
 }: GameProps) {
   return (
     <div className="app">
@@ -99,6 +104,12 @@ export default function Game({
           <div className="game-controls flex items-center gap-3">
             <Button onClick={onResetGame}>Reset Game</Button>
             <SettingsDropdown />
+            <WinsDropdown
+              myName={gameState.myName}
+              opponentName={gameState.opponentName}
+              onAddWinToMe={onAddWinToMe}
+              onAddWinToOpponent={onAddWinToOpponent}
+            />
           </div>
         )}
       </div>
@@ -110,10 +121,16 @@ export default function Game({
             name={gameState.myName}
             onNameChange={onNameUpdate}
           />
+          <span className="text-xs bg-blue-100 px-2 py-1 rounded">
+            {gameState.myWins} wins
+          </span>
         </div>
-        <div className="opponent-name">
+        <div className="opponent-name flex items-center gap-2">
           <span className="text-sm text-gray-600">Opponent: </span>
           <span className="font-medium">{gameState.opponentName}</span>
+          <span className="text-xs bg-red-100 px-2 py-1 rounded">
+            {gameState.opponentWins} wins
+          </span>
         </div>
       </div>
 

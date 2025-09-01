@@ -38,6 +38,8 @@ function App() {
     toggleCrossOut,
     resetGameState,
     updateMyName,
+    incrementMyWins,
+    incrementOpponentWins,
   } = useGameState();
 
   const gameHandlers = {
@@ -111,6 +113,8 @@ function App() {
       onCharacterClick={handleCharacterClick}
       onResetGame={handleResetGame}
       onNameUpdate={handleNameUpdate}
+      onAddWinToMe={incrementMyWins}
+      onAddWinToOpponent={incrementOpponentWins}
     />
   );
 }

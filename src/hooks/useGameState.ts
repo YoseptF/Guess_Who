@@ -11,6 +11,8 @@ export const useGameState = () => {
     opponentCrossedOut: new Set(),
     myName: "Player 1",
     opponentName: "Player 2",
+    myWins: 0,
+    opponentWins: 0,
   });
 
   const { fetchCharacters, shuffleArray } = useCharacters();
@@ -130,6 +132,8 @@ export const useGameState = () => {
       opponentCrossedOut: new Set(),
       myName: "Player 1",
       opponentName: "Player 2",
+      myWins: 0,
+      opponentWins: 0,
     });
   }, []);
 
@@ -150,6 +154,20 @@ export const useGameState = () => {
     [],
   );
 
+  const incrementMyWins = useCallback(() => {
+    setGameState((prev) => ({
+      ...prev,
+      myWins: prev.myWins + 1,
+    }));
+  }, []);
+
+  const incrementOpponentWins = useCallback(() => {
+    setGameState((prev) => ({
+      ...prev,
+      opponentWins: prev.opponentWins + 1,
+    }));
+  }, []);
+
   return {
     gameState,
     initializeGame,
@@ -158,5 +176,7 @@ export const useGameState = () => {
     toggleCrossOut,
     resetGameState,
     updateMyName,
+    incrementMyWins,
+    incrementOpponentWins,
   };
 };
