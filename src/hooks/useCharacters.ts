@@ -10,7 +10,7 @@ export const useCharacters = () => {
           ? enabledSources
           : characterProviders.map((p) => p.name);
 
-      const allCharacters: Character[] = [];
+      const allCharactersBySource: Character[][] = [];
       let globalIndex = 0;
 
       for (const sourceName of sourcesToUse) {
@@ -22,7 +22,7 @@ export const useCharacters = () => {
               ...char,
               id: globalIndex++,
             }));
-            allCharacters.push(...reindexedCharacters);
+            allCharactersBySource.push(reindexedCharacters);
           } catch (error) {
             console.error(
               `Error fetching characters from ${sourceName}:`,
@@ -32,9 +32,18 @@ export const useCharacters = () => {
         }
       }
 
-      const shuffled = allCharacters
-        .sort(() => Math.random() - 0.5)
-        .slice(0, 24);
+      // Ensure balanced distribution across sources
+      const selectedCharacters: Character[] = [];
+      const charactersPerSource = Math.floor(24 / allCharactersBySource.length);
+      const remainder = 24 % allCharactersBySource.length;
+
+      allCharactersBySource.forEach((sourceCharacters, index) => {
+        const shuffled = sourceCharacters.sort(() => Math.random() - 0.5);
+        const count = charactersPerSource + (index < remainder ? 1 : 0);
+        selectedCharacters.push(...shuffled.slice(0, count));
+      });
+
+      const shuffled = selectedCharacters.sort(() => Math.random() - 0.5);
 
       return shuffled;
     },
