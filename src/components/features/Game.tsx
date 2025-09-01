@@ -1,10 +1,18 @@
-import { useState } from "react";
 import { Settings } from "lucide-react";
 import type { GameState } from "../../types";
 import Button from "../ui/Button";
 import CharacterCard from "../ui/CharacterCard";
 import SecretCharacter from "../ui/SecretCharacter";
-import CharacterSettings from "../ui/CharacterSettings";
+import {
+  DropdownMenu,
+  DropdownMenuTrigger,
+  DropdownMenuContent,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuCheckboxItem,
+} from "../ui/dropdown-menu";
+import { useSettings } from "../../contexts/SettingsContext";
+import { characterProviders } from "../../providers";
 
 interface GameProps {
   gameState: GameState;
@@ -19,7 +27,7 @@ export default function Game({
   onCharacterClick,
   onResetGame,
 }: GameProps) {
-  const [showSettings, setShowSettings] = useState(false);
+  const { characterSources, updateCharacterSource } = useSettings();
 
   return (
     <div className="app">
@@ -30,22 +38,31 @@ export default function Game({
             <Button onClick={onResetGame} variant="reset">
               Reset Game
             </Button>
-            <Button
-              onClick={() => setShowSettings(!showSettings)}
-              variant="secondary"
-              title="Game Settings"
-            >
-              <Settings size={16} />
-            </Button>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="secondary" title="Game Settings">
+                  <Settings size={16} />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                <DropdownMenuLabel>Character Sources</DropdownMenuLabel>
+                <DropdownMenuSeparator />
+                {characterProviders.map((provider) => (
+                  <DropdownMenuCheckboxItem
+                    key={provider.name}
+                    checked={characterSources[provider.name] || false}
+                    onCheckedChange={(checked) =>
+                      updateCharacterSource(provider.name, checked)
+                    }
+                  >
+                    {provider.name}
+                  </DropdownMenuCheckboxItem>
+                ))}
+              </DropdownMenuContent>
+            </DropdownMenu>
           </div>
         )}
       </div>
-
-      {isHost && showSettings && (
-        <div className="settings-panel">
-          <CharacterSettings />
-        </div>
-      )}
 
       {gameState.mySecret && <SecretCharacter character={gameState.mySecret} />}
 
