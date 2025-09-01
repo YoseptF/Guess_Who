@@ -1,5 +1,3 @@
-import { Settings } from "lucide-react";
-import { Button } from "./Button";
 import {
   DropdownMenu,
   DropdownMenuCheckboxItem,
@@ -8,6 +6,9 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "./dropdown-menu";
+
+import { Button } from "./Button";
+import { Settings } from "lucide-react";
 import { characterProviders } from "../../providers";
 import { useSettings } from "../../contexts/SettingsContext";
 
@@ -17,7 +18,7 @@ interface SettingsDropdownProps {
 }
 
 export default function SettingsDropdown({
-  buttonText = "Settings",
+  buttonText = "",
   showIcon = true,
 }: SettingsDropdownProps) {
   const { characterSources, updateCharacterSource } = useSettings();

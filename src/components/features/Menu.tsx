@@ -25,9 +25,12 @@ export default function Menu({
     <div className="app">
       <h1>Guess Who?</h1>
       <div className="menu">
-        <Button onClick={onCreateRoom} variant="create">
-          Create Room
-        </Button>
+        <div className="flex items-center gap-3">
+          <Button onClick={onCreateRoom} variant="create">
+            Create Room
+          </Button>
+          <SettingsDropdown />
+        </div>
         <div className="join-section">
           <Input
             type="text"
@@ -38,7 +41,6 @@ export default function Menu({
           />
           <Button onClick={onJoinRoom}>Join Room</Button>
         </div>
-        <SettingsDropdown buttonText="Settings" showIcon={false} />
       </div>
     </div>
   );
