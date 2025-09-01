@@ -9,15 +9,18 @@ export interface GameState {
   mySecret: Character | null;
   myCrossedOut: Set<number>;
   opponentCrossedOut: Set<number>;
+  myName: string;
+  opponentName: string;
 }
 
 export type GamePhase = "menu" | "waiting" | "playing";
 
 export interface PeerData {
-  type: "gameStart" | "crossOut" | "ready";
+  type: "gameStart" | "crossOut" | "ready" | "nameUpdate";
   characters?: Character[];
   secret?: Character;
   crossedOut?: number[];
+  name?: string;
 }
 
 export interface SuperheroApiCharacter {

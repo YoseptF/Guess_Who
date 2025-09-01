@@ -37,6 +37,7 @@ function App() {
     handlePeerData,
     toggleCrossOut,
     resetGameState,
+    updateMyName,
   } = useGameState();
 
   const gameHandlers = {
@@ -47,6 +48,7 @@ function App() {
     handlePeerData,
     resetGameState,
     toggleCrossOut,
+    updateMyName,
     setIsHost,
     setRoomCode,
     createRoom,
@@ -74,6 +76,9 @@ function App() {
     }
   };
   const handleCharacterClick = createCharacterClickHandler(gameHandlers);
+  const handleNameUpdate = (name: string) => {
+    updateMyName(name, sendData);
+  };
   const handleResetGame = createGameResetHandler(
     isHost,
     handleGameInitialization,
@@ -105,6 +110,7 @@ function App() {
       isHost={isHost}
       onCharacterClick={handleCharacterClick}
       onResetGame={handleResetGame}
+      onNameUpdate={handleNameUpdate}
     />
   );
 }

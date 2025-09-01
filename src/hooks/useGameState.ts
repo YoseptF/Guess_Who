@@ -9,6 +9,8 @@ export const useGameState = () => {
     mySecret: null,
     myCrossedOut: new Set(),
     opponentCrossedOut: new Set(),
+    myName: "Player 1",
+    opponentName: "Player 2",
   });
 
   const { fetchCharacters, shuffleArray } = useCharacters();
@@ -44,12 +46,15 @@ export const useGameState = () => {
 
   const setGameAsHost = useCallback(
     (characters: Character[], secret: Character) => {
-      setGameState({
+      setGameState((prev) => ({
+        ...prev,
         characters,
         mySecret: secret,
         myCrossedOut: new Set(),
         opponentCrossedOut: new Set(),
-      });
+        myName: "Host",
+        opponentName: "Guest",
+      }));
     },
     [],
   );
@@ -59,12 +64,22 @@ export const useGameState = () => {
 
     if (data.type === "gameStart" && data.characters && data.secret) {
       console.debug("Starting game with", data.characters.length, "characters");
-      setGameState({
+      setGameState((prev) => ({
+        ...prev,
         characters: data.characters,
         mySecret: data.secret,
         myCrossedOut: new Set(),
         opponentCrossedOut: new Set(),
-      });
+        myName: "Guest",
+        opponentName: "Host",
+      }));
+      return true;
+    } else if (data.type === "nameUpdate" && data.name) {
+      console.debug("Updating opponent's name to:", data.name);
+      setGameState((prev) => ({
+        ...prev,
+        opponentName: data.name,
+      }));
       return true;
     } else if (data.type === "crossOut" && data.crossedOut) {
       console.debug("Updating opponent's crossed out characters");
@@ -113,8 +128,27 @@ export const useGameState = () => {
       mySecret: null,
       myCrossedOut: new Set(),
       opponentCrossedOut: new Set(),
+      myName: "Player 1",
+      opponentName: "Player 2",
     });
   }, []);
+
+  const updateMyName = useCallback(
+    (name: string, onSendData?: (data: PeerData) => void) => {
+      setGameState((prev) => ({
+        ...prev,
+        myName: name,
+      }));
+
+      if (onSendData) {
+        onSendData({
+          type: "nameUpdate",
+          name: name,
+        });
+      }
+    },
+    [],
+  );
 
   return {
     gameState,
@@ -123,5 +157,6 @@ export const useGameState = () => {
     handlePeerData,
     toggleCrossOut,
     resetGameState,
+    updateMyName,
   };
 };
