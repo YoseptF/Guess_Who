@@ -1,5 +1,6 @@
-import Button from "../ui/Button";
+import { Button } from "../ui/Button";
 import CharacterSettings from "../ui/CharacterSettings";
+import { Input } from "../ui/Input";
 import { useState } from "react";
 
 interface MenuProps {
@@ -30,20 +31,17 @@ export default function Menu({
           Create Room
         </Button>
         <div className="join-section">
-          <input
+          <Input
             type="text"
             placeholder="Enter room code"
             value={inputCode}
             onChange={(e) => onInputCodeChange(e.target.value)}
-            onKeyPress={handleKeyPress}
-            className="code-input"
+            onKeyDown={handleKeyPress}
           />
-          <Button onClick={onJoinRoom} variant="join">
-            Join Room
-          </Button>
+          <Button onClick={onJoinRoom}>Join Room</Button>
         </div>
-        <div className="settings-section">
-          <Button onClick={() => setShowSettings(!showSettings)} variant="join">
+        <div>
+          <Button onClick={() => setShowSettings(!showSettings)}>
             {showSettings ? "Hide Settings" : "Settings"}
           </Button>
           {showSettings && <CharacterSettings />}

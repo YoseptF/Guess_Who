@@ -1,6 +1,6 @@
 import { Settings } from "lucide-react";
 import type { GameState } from "../../types";
-import Button from "../ui/Button";
+import { Button } from "../ui/Button";
 import CharacterCard from "../ui/CharacterCard";
 import SecretCharacter from "../ui/SecretCharacter";
 import {
