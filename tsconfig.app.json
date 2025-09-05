@@ -27,5 +27,5 @@
       "@/*": ["./src/*"]
     }
   },
-  "include": ["src", "apps/**/src/**/*", "apps/**/vite.config.ts"]
+  "include": ["src", "apps/**/src/**/*", "apps/**/vite.config.ts", "libs/**/src/**/*"]
 }

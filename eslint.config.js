@@ -30,6 +30,9 @@ export default tseslint.config([
       '@typescript-eslint/no-unsafe-member-access': 'error',
       '@typescript-eslint/no-namespace': 'error',
       'func-style': ['error', 'expression'],
+      'arrow-body-style': ['error', 'as-needed'],
+      'arrow-parens': ['error', 'as-needed'],
+      'arrow-spacing': 'error',
     },
   },
 ]);

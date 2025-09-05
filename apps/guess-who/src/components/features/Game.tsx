@@ -1,4 +1,4 @@
-import { Button } from "../ui/Button";
+import { Button } from "shared-ui";
 import CharacterCard from "../ui/CharacterCard";
 import type { GameState } from "../../types";
 import SecretCharacter from "../ui/SecretCharacter";
