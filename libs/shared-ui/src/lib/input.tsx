@@ -21,5 +21,3 @@ export const Input = ({
     />
   );
 };
-
-export { Input };

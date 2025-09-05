@@ -52,5 +52,3 @@ export const Button = ({
     </Comp>
   );
 };
-
-export { Button };
