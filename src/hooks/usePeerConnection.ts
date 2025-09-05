@@ -14,7 +14,7 @@ export const usePeerConnection = () => {
   const connectionRef = useRef<DataConnection | null>(null);
 
   const assertPeerData: (data: unknown) => asserts data is PeerData = (
-    data: unknown
+    data: unknown,
   ): asserts data is PeerData => {
     if (typeof data !== "object" || data === null) {
       throw new Error("Invalid peer data");
@@ -42,7 +42,7 @@ export const usePeerConnection = () => {
       onConnectionEstablished: () => void,
       onDataReceived: (data: PeerData) => void,
       onDisconnect: () => void,
-      onError: (error: Error) => void
+      onError: (error: Error) => void,
     ) => {
       console.debug("Creating room...");
 
@@ -89,7 +89,7 @@ export const usePeerConnection = () => {
         onError(err);
       });
     },
-    [createPeer]
+    [createPeer],
   );
 
   const joinRoom = useCallback(
@@ -98,7 +98,7 @@ export const usePeerConnection = () => {
       onConnected: () => void,
       onDataReceived: (data: PeerData) => void,
       onDisconnect: () => void,
-      onError: (error: Error) => void
+      onError: (error: Error) => void,
     ) => {
       console.debug("Joining room:", roomCode);
 
@@ -144,7 +144,7 @@ export const usePeerConnection = () => {
         onError(err);
       });
     },
-    [createPeer]
+    [createPeer],
   );
 
   const sendData = useCallback((data: PeerData) => {
