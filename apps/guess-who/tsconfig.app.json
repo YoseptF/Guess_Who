@@ -18,7 +18,9 @@
     "strict": true,
     "baseUrl": ".",
     "paths": {
-      "@/*": ["./src/*"]
+      "@/*": ["./src/*"],
+      "shared-ui": ["../../libs/shared-ui/src/index.ts"],
+      "game-utils": ["../../libs/game-utils/src/index.ts"]
     }
   },
   "files": [

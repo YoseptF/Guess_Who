@@ -24,6 +24,11 @@ export default defineConfig({
   resolve: {
     alias: {
       '@': path.resolve(__dirname, './src'),
+      'shared-ui': path.resolve(__dirname, '../../libs/shared-ui/src/index.ts'),
+      'game-utils': path.resolve(
+        __dirname,
+        '../../libs/game-utils/src/index.ts',
+      ),
     },
   },
 
