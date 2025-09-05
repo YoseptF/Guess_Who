@@ -4,11 +4,19 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "nx serve",
-    "build": "tsc -b && nx vite:build",
-    "lint": "eslint .",
-    "preview": "nx vite:preview",
-    "type-check": "tsc --noEmit --project tsconfig.app.json"
+    "dev": "nx serve guess-who",
+    "dev:main": "nx serve main-site",
+    "dev:guess-who": "nx serve guess-who",
+    "build": "nx build guess-who && nx build main-site",
+    "build:main": "nx build main-site",
+    "build:guess-who": "nx build guess-who",
+    "preview:main": "nx preview main-site", 
+    "preview:guess-who": "nx preview guess-who",
+    "lint": "nx run-many -t lint",
+    "lint:main": "nx lint main-site",
+    "lint:guess-who": "nx lint guess-who",
+    "type-check": "nx run-many -t typecheck",
+    "graph": "nx graph"
   },
   "dependencies": {
     "@radix-ui/react-dropdown-menu": "^2.1.16",
