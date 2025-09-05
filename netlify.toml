@@ -1,0 +1,24 @@
+# Main site - games.yosept.me
+[build]
+  command = "bunx nx build main-site"
+  publish = "dist/apps/main-site"
+
+# Guess Who subdomain - guesswho.yosept.me
+[[deploy-contexts.apps--guess-who]]
+  command = "bunx nx build guess-who"
+  publish = "dist/apps/guess-who"
+
+# NX affected builds for selective deployment
+[build.environment]
+  NODE_VERSION = "18"
+  
+# Path-based routing for different apps
+[[redirects]]
+  from = "https://guesswho.yosept.me/*"
+  to = "https://guesswho.yosept.me/:splat"
+  status = 200
+  
+[[redirects]]
+  from = "https://games.yosept.me/*"
+  to = "https://games.yosept.me/:splat"
+  status = 200

@@ -1,0 +1,13 @@
+# Configuration for games.yosept.me
+[build]
+  command = "bunx nx build main-site"
+  publish = "dist/apps/main-site"
+
+[build.environment]
+  NODE_VERSION = "18"
+
+# Handle client-side routing
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
