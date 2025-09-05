@@ -1,0 +1,182 @@
+import { useState, useCallback } from "react";
+import type { Character, GameState, PeerData } from "../types";
+import { useCharacters } from "./useCharacters";
+import { useSettings } from "../contexts/SettingsContext";
+
+export const useGameState = () => {
+  const [gameState, setGameState] = useState<GameState>({
+    characters: [],
+    mySecret: null,
+    myCrossedOut: new Set(),
+    opponentCrossedOut: new Set(),
+    myName: "Player 1",
+    opponentName: "Player 2",
+    myWins: 0,
+    opponentWins: 0,
+  });
+
+  const { fetchCharacters, shuffleArray } = useCharacters();
+  const { getEnabledSources } = useSettings();
+
+  const initializeGame = useCallback(async (): Promise<{
+    hostChars: Character[];
+    guestChars: Character[];
+    hostSecret: Character;
+    guestSecret: Character;
+  } | null> => {
+    console.debug("Initializing game...");
+    const enabledSources = getEnabledSources();
+    const characters = await fetchCharacters(enabledSources);
+    if (characters.length === 0) return null;
+
+    const hostSecret =
+      characters[Math.floor(Math.random() * characters.length)];
+    const guestSecretOptions = characters.filter((c) => c.id !== hostSecret.id);
+    const guestSecret =
+      guestSecretOptions[Math.floor(Math.random() * guestSecretOptions.length)];
+
+    const hostChars = shuffleArray(characters);
+    const guestChars = shuffleArray(characters);
+
+    return {
+      hostChars,
+      guestChars,
+      hostSecret,
+      guestSecret,
+    };
+  }, [fetchCharacters, shuffleArray, getEnabledSources]);
+
+  const setGameAsHost = useCallback(
+    (characters: Character[], secret: Character) => {
+      setGameState((prev) => ({
+        ...prev,
+        characters,
+        mySecret: secret,
+        myCrossedOut: new Set(),
+        opponentCrossedOut: new Set(),
+        myName: "Host",
+        opponentName: "Guest",
+      }));
+    },
+    [],
+  );
+
+  const handlePeerData = useCallback((data: PeerData) => {
+    console.debug("Processing data of type:", data.type);
+
+    if (data.type === "gameStart" && data.characters && data.secret) {
+      console.debug("Starting game with", data.characters.length, "characters");
+      setGameState((prev) => ({
+        ...prev,
+        characters: data.characters || [],
+        mySecret: data.secret || null,
+        myCrossedOut: new Set(),
+        opponentCrossedOut: new Set(),
+        myName: "Guest",
+        opponentName: "Host",
+      }));
+      return true;
+    } else if (data.type === "nameUpdate" && data.name) {
+      console.debug("Updating opponent's name to:", data.name);
+      setGameState((prev) => ({
+        ...prev,
+        opponentName: data.name || "",
+      }));
+      return true;
+    } else if (data.type === "crossOut" && data.crossedOut) {
+      console.debug("Updating opponent's crossed out characters");
+      setGameState((prev) => ({
+        ...prev,
+        opponentCrossedOut: new Set(data.crossedOut),
+      }));
+      return true;
+    } else if (data.type === "ready") {
+      console.debug("Guest is ready");
+      return true;
+    }
+
+    return false;
+  }, []);
+
+  const toggleCrossOut = useCallback(
+    (characterId: number, onSendData?: (data: PeerData) => void) => {
+      setGameState((prev) => {
+        const newMyCrossedOut = new Set(prev.myCrossedOut);
+        if (newMyCrossedOut.has(characterId)) {
+          newMyCrossedOut.delete(characterId);
+        } else {
+          newMyCrossedOut.add(characterId);
+        }
+
+        if (onSendData) {
+          onSendData({
+            type: "crossOut",
+            crossedOut: Array.from(newMyCrossedOut),
+          });
+        }
+
+        return {
+          ...prev,
+          myCrossedOut: newMyCrossedOut,
+        };
+      });
+    },
+    [],
+  );
+
+  const resetGameState = useCallback(() => {
+    setGameState({
+      characters: [],
+      mySecret: null,
+      myCrossedOut: new Set(),
+      opponentCrossedOut: new Set(),
+      myName: "Player 1",
+      opponentName: "Player 2",
+      myWins: 0,
+      opponentWins: 0,
+    });
+  }, []);
+
+  const updateMyName = useCallback(
+    (name: string, onSendData?: (data: PeerData) => void) => {
+      setGameState((prev) => ({
+        ...prev,
+        myName: name,
+      }));
+
+      if (onSendData) {
+        onSendData({
+          type: "nameUpdate",
+          name: name,
+        });
+      }
+    },
+    [],
+  );
+
+  const incrementMyWins = useCallback(() => {
+    setGameState((prev) => ({
+      ...prev,
+      myWins: prev.myWins + 1,
+    }));
+  }, []);
+
+  const incrementOpponentWins = useCallback(() => {
+    setGameState((prev) => ({
+      ...prev,
+      opponentWins: prev.opponentWins + 1,
+    }));
+  }, []);
+
+  return {
+    gameState,
+    initializeGame,
+    setGameAsHost,
+    handlePeerData,
+    toggleCrossOut,
+    resetGameState,
+    updateMyName,
+    incrementMyWins,
+    incrementOpponentWins,
+  };
+};

@@ -25,3 +25,12 @@ dist-ssr
 
 # Local Netlify folder
 .netlify
+
+
+
+.nx/cache
+.nx/workspace-data
+.cursor/rules/nx-rules.mdc
+.github/instructions/nx.instructions.md
+vite.config.*.timestamp*
+vitest.config.*.timestamp*

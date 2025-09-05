@@ -1,0 +1,59 @@
+{
+  "name": "guess-who",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "projectType": "application",
+  "sourceRoot": "apps/guess-who/src",
+  "targets": {
+    "build": {
+      "executor": "@nx/vite:build",
+      "outputs": ["{options.outputPath}"],
+      "defaultConfiguration": "production",
+      "options": {
+        "outputPath": "dist/apps/guess-who"
+      },
+      "configurations": {
+        "development": {
+          "mode": "development"
+        },
+        "production": {
+          "mode": "production"
+        }
+      }
+    },
+    "serve": {
+      "executor": "@nx/vite:dev-server",
+      "defaultConfiguration": "development",
+      "options": {
+        "buildTarget": "guess-who:build"
+      },
+      "configurations": {
+        "development": {
+          "buildTarget": "guess-who:build:development",
+          "hmr": true
+        },
+        "production": {
+          "buildTarget": "guess-who:build:production"
+        }
+      }
+    },
+    "preview": {
+      "executor": "@nx/vite:preview-server",
+      "defaultConfiguration": "development",
+      "options": {
+        "buildTarget": "guess-who:build"
+      },
+      "configurations": {
+        "development": {
+          "buildTarget": "guess-who:build:development"
+        },
+        "production": {
+          "buildTarget": "guess-who:build:production"
+        }
+      }
+    },
+    "lint": {
+      "executor": "@nx/eslint:lint"
+    }
+  },
+  "tags": ["type:app", "scope:guess-who"]
+}
