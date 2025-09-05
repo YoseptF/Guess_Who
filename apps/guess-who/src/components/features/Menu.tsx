@@ -1,6 +1,5 @@
-import { Button } from "../ui/Button";
-import { Input } from "../ui/input";
-import SettingsDropdown from "../ui/SettingsDropdown";
+import { Button, Input } from 'shared-ui';
+import SettingsDropdown from '../ui/SettingsDropdown';
 
 interface MenuProps {
   inputCode: string;
@@ -18,7 +17,7 @@ export default function Menu({
   isJoining,
 }: MenuProps) {
   const handleKeyPress = (e: React.KeyboardEvent) => {
-    if (e.key === "Enter" && !isJoining) {
+    if (e.key === 'Enter' && !isJoining) {
       onJoinRoom();
     }
   };

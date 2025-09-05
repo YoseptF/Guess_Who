@@ -1,10 +1,10 @@
-import { Button } from "shared-ui";
-import CharacterCard from "../ui/CharacterCard";
-import type { GameState } from "../../types";
-import SecretCharacter from "../ui/SecretCharacter";
-import SettingsDropdown from "../ui/SettingsDropdown";
-import WinsDropdown from "../ui/WinsDropdown";
-import PlayerNames from "../ui/PlayerNames";
+import { Button } from 'shared-ui';
+import CharacterCard from '../ui/CharacterCard';
+import type { GameState } from '../../types';
+import SecretCharacter from '../ui/SecretCharacter';
+import SettingsDropdown from '../ui/SettingsDropdown';
+import WinsDropdown from '../ui/WinsDropdown';
+import PlayerNames from '../ui/PlayerNames';
 
 interface GameProps {
   gameState: GameState;

@@ -1,31 +1,37 @@
-import type { GamePhase } from "./types";
-import { useEffect, useState } from "react";
+import type { GamePhase } from './types';
+import { useEffect, useState } from 'react';
 
-import Menu from "./components/features/Menu";
-import Waiting from "./components/features/Waiting";
-import Game from "./components/features/Game";
-import { usePeerConnection } from "./hooks/usePeerConnection";
-import { useGameState } from "./hooks/useGameState";
-import { getRoomCodeFromUrl } from "./lib/utils";
+import Menu from './components/features/Menu';
+import Waiting from './components/features/Waiting';
+import Game from './components/features/Game';
+import { usePeerConnection } from './hooks/usePeerConnection';
+import { useGameState } from './hooks/useGameState';
+import { getRoomCodeFromUrl } from 'game-utils';
 import {
   createGameInitializationHandler,
   createRoomCreationHandler,
   createRoomJoiningHandler,
   createCharacterClickHandler,
   createGameResetHandler,
-} from "./lib/gameHandlers";
+} from 'game-utils';
 
-function App() {
-  const [gamePhase, setGamePhase] = useState<GamePhase>("menu");
-  const [roomCode, setRoomCode] = useState("");
-  const [inputCode, setInputCode] = useState("");
+const App = () => {
+  const [gamePhase, setGamePhase] = useState<GamePhase>('menu');
+  const [roomCode, setRoomCode] = useState('');
+  const [inputCode, setInputCode] = useState('');
   const [isHost, setIsHost] = useState(false);
   const [isJoining, setIsJoining] = useState(false);
 
   useEffect(() => {
-    const roomCodeFromUrl = getRoomCodeFromUrl();
-    if (roomCodeFromUrl) {
-      setInputCode(roomCodeFromUrl);
+    try {
+      const roomCodeFromUrl: string | null = getRoomCodeFromUrl() as
+        | string
+        | null;
+      if (roomCodeFromUrl) {
+        setInputCode(roomCodeFromUrl);
+      }
+    } catch {
+      // Ignore URL parsing errors
     }
   }, []);
 
@@ -86,11 +92,9 @@ function App() {
     handleGameInitialization,
   );
 
-  useEffect(() => {
-    return cleanup;
-  }, [cleanup]);
+  useEffect(() => cleanup, [cleanup]);
 
-  if (gamePhase === "menu") {
+  if (gamePhase === 'menu') {
     return (
       <Menu
         inputCode={inputCode}
@@ -102,7 +106,7 @@ function App() {
     );
   }
 
-  if (gamePhase === "waiting") {
+  if (gamePhase === 'waiting') {
     return <Waiting isHost={isHost} roomCode={roomCode} />;
   }
 
@@ -117,6 +121,6 @@ function App() {
       onAddWinToOpponent={incrementOpponentWins}
     />
   );
-}
+};
 
 export default App;

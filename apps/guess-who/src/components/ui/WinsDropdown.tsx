@@ -5,10 +5,9 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "./dropdown-menu";
-
-import { Button } from "./Button";
-import { Trophy } from "lucide-react";
+  Button,
+} from 'shared-ui';
+import { Trophy } from 'lucide-react';
 
 interface WinsDropdownProps {
   myName: string;

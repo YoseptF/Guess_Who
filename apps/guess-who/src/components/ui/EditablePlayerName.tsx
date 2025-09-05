@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { Button } from "./Button";
+import { useState } from 'react';
+import { Button } from 'shared-ui';
 
 interface EditablePlayerNameProps {
   name: string;
@@ -32,8 +32,8 @@ export default function EditablePlayerName({
           onChange={(e) => setTempName(e.target.value)}
           className="px-2 py-1 border border-gray-300 rounded text-sm"
           onKeyDown={(e) => {
-            if (e.key === "Enter") handleSave();
-            if (e.key === "Escape") handleCancel();
+            if (e.key === 'Enter') handleSave();
+            if (e.key === 'Escape') handleCancel();
           }}
           autoFocus
         />

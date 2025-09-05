@@ -5,12 +5,11 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "./dropdown-menu";
-
-import { Button } from "./Button";
-import { Settings } from "lucide-react";
-import { characterProviders } from "../../providers";
-import { useSettings } from "../../contexts/SettingsContext";
+  Button,
+} from 'shared-ui';
+import { Settings } from 'lucide-react';
+import { characterProviders } from '../../providers';
+import { useSettings } from '../../contexts/SettingsContext';
 
 interface SettingsDropdownProps {
   buttonText?: string;
@@ -18,7 +17,7 @@ interface SettingsDropdownProps {
 }
 
 export default function SettingsDropdown({
-  buttonText = "",
+  buttonText = '',
   showIcon = true,
 }: SettingsDropdownProps) {
   const { characterSources, updateCharacterSource } = useSettings();
@@ -41,7 +40,7 @@ export default function SettingsDropdown({
             onCheckedChange={(checked) =>
               updateCharacterSource(provider.name, checked)
             }
-            onSelect={(event) => event.preventDefault()}
+            onSelect={(event: Event) => event.preventDefault()}
           >
             {provider.name}
           </DropdownMenuCheckboxItem>
