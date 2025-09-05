@@ -4,6 +4,7 @@
     "baseUrl": ".",
     "paths": {
       "@/*": ["./src/*"],
+      "game-utils": ["libs/game-utils/src/index.ts"],
       "shared-ui": ["libs/shared-ui/src/index.ts"]
     }
   }

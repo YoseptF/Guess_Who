@@ -1,3 +1,4 @@
+import baseConfig from './eslint.config.js';
 import { globalIgnores } from 'eslint/config';
 import globals from 'globals';
 import js from '@eslint/js';
