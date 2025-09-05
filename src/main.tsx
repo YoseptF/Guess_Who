@@ -7,7 +7,7 @@ import { SettingsProvider } from "./contexts/SettingsContext.tsx";
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
     <SettingsProvider>
-      <App />
+          <App />
     </SettingsProvider>
   </StrictMode>,
 );
