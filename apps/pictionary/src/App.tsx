@@ -41,9 +41,12 @@ const App = () => {
     handlePeerData,
   } = useGameState();
 
+  const gameStateRef = useRef(gameState);
+
   useEffect(() => {
+    gameStateRef.current = gameState;
     playersRef.current = gameState.players;
-  }, [gameState.players]);
+  }, [gameState]);
 
   const { createRoom, joinRoom, broadcast, sendTo, cleanup, getMyId } =
     usePeerConnection();
@@ -51,7 +54,8 @@ const App = () => {
   const handleTimeout = useCallback(() => {
     if (!isHost) return;
 
-    broadcast({ type: 'roundTimeout', word: gameState.currentWord || '' });
+    const currentWord = gameStateRef.current.currentWord || '';
+    broadcast({ type: 'roundTimeout', word: currentWord });
     endRound(null);
     setGamePhase('roundEnd');
 
@@ -59,7 +63,7 @@ const App = () => {
       broadcast({ type: 'showScoreboard' });
       showScoreboard();
     }, 3000);
-  }, [isHost, broadcast, gameState.currentWord, endRound, showScoreboard]);
+  }, [isHost, broadcast, endRound, showScoreboard]);
 
   const {
     timeRemaining,
@@ -67,6 +71,46 @@ const App = () => {
     stop: stopTimer,
     reset: resetTimer,
   } = useTimer(timerDuration, handleTimeout);
+
+  const processGuess = useCallback((playerId: string, guess: string) => {
+    const currentState = gameStateRef.current;
+    console.debug('Guess received:', guess);
+    console.debug('Current word:', currentState.currentWord);
+    console.debug('Match:', guess === currentState.currentWord?.toLowerCase());
+
+    if (
+      currentState.currentWord &&
+      guess === currentState.currentWord.toLowerCase()
+    ) {
+      console.debug('CORRECT GUESS! Processing...');
+      stopTimer();
+
+      const newScores = Object.fromEntries(
+        Array.from(currentState.players.entries()).map(([id, p]) => {
+          let score = p.score;
+          if (id === playerId) score += 10;
+          if (id === currentState.currentDrawerId) score += 5;
+          return [id, score];
+        }),
+      );
+
+      broadcast({ type: 'updateScores', scores: newScores });
+      broadcast({
+        type: 'correctGuess',
+        playerId,
+        word: currentState.currentWord,
+      });
+
+      updateScores(newScores);
+      endRound(playerId);
+      setGamePhase('roundEnd');
+
+      setTimeout(() => {
+        broadcast({ type: 'showScoreboard' });
+        showScoreboard();
+      }, 3000);
+    }
+  }, [stopTimer, broadcast, updateScores, endRound, showScoreboard]);
 
   useEffect(() => {
     const code = getRoomCodeFromUrl();
@@ -113,37 +157,7 @@ const App = () => {
           addDrawingEvent(data.event);
           broadcast(data);
         } else if (data.type === 'guess') {
-          if (
-            gameState.currentWord &&
-            data.guess === gameState.currentWord.toLowerCase()
-          ) {
-            stopTimer();
-
-            const newScores = Object.fromEntries(
-              Array.from(gameState.players.entries()).map(([id, p]) => {
-                let score = p.score;
-                if (id === data.playerId) score += 10;
-                if (id === gameState.currentDrawerId) score += 5;
-                return [id, score];
-              }),
-            );
-
-            broadcast({ type: 'updateScores', scores: newScores });
-            broadcast({
-              type: 'correctGuess',
-              playerId: data.playerId,
-              word: gameState.currentWord,
-            });
-
-            updateScores(newScores);
-            endRound(data.playerId);
-            setGamePhase('roundEnd');
-
-            setTimeout(() => {
-              broadcast({ type: 'showScoreboard' });
-              showScoreboard();
-            }, 3000);
-          }
+          processGuess(data.playerId, data.guess);
         } else {
           handlePeerData(data, peerId);
         }
@@ -160,16 +174,10 @@ const App = () => {
     getMyId,
     addPlayer,
     sendTo,
-    gameState.currentWord,
-    gameState.currentDrawerId,
-    gameState.players,
     broadcast,
     setPlayerReady,
     addDrawingEvent,
-    stopTimer,
-    updateScores,
-    endRound,
-    showScoreboard,
+    processGuess,
     handlePeerData,
     removePlayer,
   ]);
@@ -218,6 +226,8 @@ const App = () => {
           startTimer();
         } else if (data.type === 'drawing') {
           addDrawingEvent(data.event);
+        } else if (data.type === 'updateScores') {
+          updateScores(data.scores);
         } else if (
           data.type === 'correctGuess' ||
           data.type === 'roundTimeout'
@@ -249,6 +259,7 @@ const App = () => {
     handlePeerData,
     startTimer,
     addDrawingEvent,
+    updateScores,
     stopTimer,
   ]);
 
@@ -304,8 +315,12 @@ const App = () => {
   const handleGuess = useCallback(
     (guess: string) => {
       broadcast({ type: 'guess', playerId: myId, guess });
+
+      if (isHost) {
+        processGuess(myId, guess);
+      }
     },
-    [broadcast, myId],
+    [broadcast, myId, isHost, processGuess],
   );
 
   const handleContinue = useCallback(() => {
