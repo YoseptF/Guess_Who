@@ -1,0 +1,61 @@
+{
+  "name": "pictionary",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "projectType": "application",
+  "sourceRoot": "apps/pictionary/src",
+  "targets": {
+    "build": {
+      "executor": "@nx/vite:build",
+      "outputs": ["{options.outputPath}"],
+      "defaultConfiguration": "production",
+      "options": {
+        "outputPath": "dist/apps/pictionary"
+      },
+      "configurations": {
+        "development": {
+          "mode": "development"
+        },
+        "production": {
+          "mode": "production"
+        }
+      }
+    },
+    "serve": {
+      "executor": "@nx/vite:dev-server",
+      "defaultConfiguration": "development",
+      "options": {
+        "buildTarget": "pictionary:build",
+        "port": 4400
+      },
+      "configurations": {
+        "development": {
+          "buildTarget": "pictionary:build:development",
+          "hmr": true
+        },
+        "production": {
+          "buildTarget": "pictionary:build:production"
+        }
+      }
+    },
+    "preview": {
+      "executor": "@nx/vite:preview-server",
+      "defaultConfiguration": "development",
+      "options": {
+        "buildTarget": "pictionary:build",
+        "port": 4500
+      },
+      "configurations": {
+        "development": {
+          "buildTarget": "pictionary:build:development"
+        },
+        "production": {
+          "buildTarget": "pictionary:build:production"
+        }
+      }
+    },
+    "lint": {
+      "executor": "@nx/eslint:lint"
+    }
+  },
+  "tags": ["type:app", "scope:pictionary"]
+}
