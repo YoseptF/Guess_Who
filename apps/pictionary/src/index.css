@@ -23,8 +23,8 @@
   --card-foreground: oklch(0.129 0.042 264.695);
   --popover: oklch(1 0 0);
   --popover-foreground: oklch(0.129 0.042 264.695);
-  --primary: oklch(0.208 0.042 265.755);
-  --primary-foreground: oklch(0.984 0.003 247.858);
+  --primary: oklch(1 0 0);
+  --primary-foreground: oklch(0.35 0.15 280);
   --secondary: oklch(0.968 0.007 247.896);
   --secondary-foreground: oklch(0.208 0.042 265.755);
   --muted: oklch(0.968 0.007 247.896);
@@ -157,7 +157,8 @@ button:not([data-slot="button"]):focus-visible {
     @apply border-border outline-ring/50 box-border;
   }
   body {
-    @apply bg-background text-foreground m-0 p-0;
+    @apply text-foreground m-0 p-0;
+    background: transparent;
     font-family: "Arial", sans-serif;
   }
   html {
@@ -185,6 +186,38 @@ button:not([data-slot="button"]):focus-visible {
   .menu {
     @apply flex flex-col gap-8 items-center mt-12;
     animation: fadeInUp 0.8s ease;
+  }
+
+  .join-section {
+    @apply flex flex-col gap-4 items-center;
+  }
+
+  .settings-section {
+    @apply flex flex-col gap-4 items-center;
+  }
+
+  .character-settings {
+    @apply bg-white/10 rounded-xl p-5 mt-4 backdrop-blur-sm border border-white/20;
+  }
+
+  .character-settings h3 {
+    @apply m-0 mb-4 text-center text-xl;
+  }
+
+  .settings-grid {
+    @apply grid grid-cols-[repeat(auto-fit,minmax(120px,1fr))] gap-3;
+  }
+
+  .setting-item {
+    @apply flex items-center gap-2 cursor-pointer p-2 px-3 rounded-lg bg-white/10 transition-all duration-200 hover:bg-white/20 hover:-translate-y-0.5;
+  }
+
+  .setting-item input[type="checkbox"] {
+    @apply w-4 h-4 cursor-pointer;
+  }
+
+  .setting-item span {
+    @apply text-sm select-none;
   }
 
   .code-input {
