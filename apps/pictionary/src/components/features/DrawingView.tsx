@@ -34,23 +34,23 @@ const DrawingView = ({
   const sizes = [1, 3, 5, 10];
 
   return (
-    <div className="app">
-      <div className="flex flex-col items-center gap-6 w-full">
-        <div className="flex items-center justify-between w-full max-w-4xl">
-          <div className="text-3xl font-bold text-white bg-white/20 px-8 py-4 rounded-xl backdrop-blur-sm">
+    <div className="app h-screen overflow-hidden flex flex-col w-full" style={{ touchAction: 'none' }}>
+      <div className="flex flex-col items-center gap-3 p-3 bg-gradient-to-b from-purple-900 to-purple-900/95 w-full">
+        <div className="flex items-center justify-between w-full max-w-4xl flex-wrap gap-2">
+          <div className="text-xl md:text-3xl font-bold text-white bg-white/20 px-3 md:px-8 py-2 md:py-4 rounded-xl backdrop-blur-sm">
             Draw: <span className="text-yellow-300">{word}</span>
           </div>
           <Timer timeRemaining={timeRemaining} />
         </div>
 
-        <div className="flex gap-4 bg-white/10 p-4 rounded-xl backdrop-blur-sm">
-          <div className="flex gap-2 items-center">
-            <span className="text-white font-semibold">Color:</span>
+        <div className="flex flex-col md:flex-row gap-2 bg-white/10 p-2 md:p-4 rounded-xl backdrop-blur-sm w-full max-w-4xl">
+          <div className="flex gap-1.5 items-center flex-wrap">
+            <span className="text-white font-semibold text-xs md:text-sm">Color:</span>
             {colors.map(color => (
               <button
                 key={color}
                 onClick={() => setCurrentColor(color)}
-                className={`w-10 h-10 rounded-full border-2 transition-all ${
+                className={`w-7 h-7 md:w-10 md:h-10 rounded-full border-2 transition-all ${
                   currentColor === color ? 'border-white scale-110' : 'border-white/30'
                 }`}
                 style={{ backgroundColor: color }}
@@ -58,13 +58,13 @@ const DrawingView = ({
             ))}
           </div>
 
-          <div className="flex gap-2 items-center ml-4">
-            <span className="text-white font-semibold">Size:</span>
+          <div className="flex gap-1.5 items-center flex-wrap md:ml-4">
+            <span className="text-white font-semibold text-xs md:text-sm">Size:</span>
             {sizes.map(size => (
               <button
                 key={size}
                 onClick={() => setCurrentSize(size)}
-                className={`w-10 h-10 rounded-full bg-white/20 text-white font-bold transition-all ${
+                className={`w-7 h-7 md:w-10 md:h-10 rounded-full bg-white/20 text-white font-bold text-xs md:text-sm transition-all ${
                   currentSize === size ? 'bg-white/40 scale-110' : ''
                 }`}
               >
@@ -73,12 +73,14 @@ const DrawingView = ({
             ))}
           </div>
 
-          <Button onClick={clearCanvas} variant="destructive" size="sm" className="ml-4">
+          <Button onClick={clearCanvas} variant="destructive" size="sm" className="md:ml-4 w-full md:w-auto">
             Clear
           </Button>
         </div>
+      </div>
 
-        <Canvas ref={canvasRef} canvasWidth={800} canvasHeight={600} />
+      <div className="flex-1 flex items-center justify-center overflow-hidden w-full">
+        <Canvas ref={canvasRef} />
       </div>
     </div>
   );

@@ -61,6 +61,8 @@ export const useCanvas = (
   const handlePointerDown = useCallback((e: PointerEvent) => {
     if (!isDrawing || !canvasRef.current) return;
 
+    e.preventDefault();
+
     isDrawingRef.current = true;
     const rect = canvasRef.current.getBoundingClientRect();
     const x = e.clientX - rect.left;
@@ -71,6 +73,8 @@ export const useCanvas = (
 
   const handlePointerMove = useCallback((e: PointerEvent) => {
     if (!isDrawingRef.current || !canvasRef.current) return;
+
+    e.preventDefault();
 
     const rect = canvasRef.current.getBoundingClientRect();
     const x = e.clientX - rect.left;
@@ -85,8 +89,10 @@ export const useCanvas = (
     );
   }, [drawLine]);
 
-  const handlePointerUp = useCallback(() => {
+  const handlePointerUp = useCallback((e: PointerEvent) => {
     if (!isDrawingRef.current) return;
+
+    e.preventDefault();
 
     isDrawingRef.current = false;
 
@@ -123,10 +129,12 @@ export const useCanvas = (
     const canvas = canvasRef.current;
     if (!canvas) return;
 
-    canvas.addEventListener('pointerdown', handlePointerDown);
-    canvas.addEventListener('pointermove', handlePointerMove);
-    canvas.addEventListener('pointerup', handlePointerUp);
-    canvas.addEventListener('pointerleave', handlePointerUp);
+    const options = { passive: false };
+
+    canvas.addEventListener('pointerdown', handlePointerDown, options);
+    canvas.addEventListener('pointermove', handlePointerMove, options);
+    canvas.addEventListener('pointerup', handlePointerUp, options);
+    canvas.addEventListener('pointerleave', handlePointerUp, options);
 
     return () => {
       canvas.removeEventListener('pointerdown', handlePointerDown);
