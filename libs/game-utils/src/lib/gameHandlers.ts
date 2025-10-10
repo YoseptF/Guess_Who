@@ -1,4 +1,4 @@
-import type { PeerData, Character, GamePhase } from '../types';
+import type { PeerData, Character, GamePhase } from './types';
 
 export interface GameData {
   hostChars: Character[];

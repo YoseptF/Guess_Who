@@ -1,8 +1,6 @@
-export interface Character {
-  id: number;
-  name: string;
-  image: string;
-}
+import type { Character, GamePhase, PeerData } from 'game-utils';
+
+export type { Character, GamePhase, PeerData };
 
 export interface GameState {
   characters: Character[];
@@ -13,16 +11,6 @@ export interface GameState {
   opponentName: string;
   myWins: number;
   opponentWins: number;
-}
-
-export type GamePhase = "menu" | "waiting" | "playing";
-
-export interface PeerData {
-  type: "gameStart" | "crossOut" | "ready" | "nameUpdate";
-  characters?: Character[];
-  secret?: Character;
-  crossedOut?: number[];
-  name?: string;
 }
 
 export interface SuperheroApiCharacter {
