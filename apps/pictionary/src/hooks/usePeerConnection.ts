@@ -3,11 +3,6 @@ import { useCallback, useRef } from 'react';
 import { humanId } from 'human-id';
 import type { PictionaryPeerData } from '../types';
 
-const ID = humanId({
-  separator: '-',
-  capitalize: false,
-});
-
 export const usePeerConnection = () => {
   const peerRef = useRef<Peer | null>(null);
   const connectionsRef = useRef<Map<string, DataConnection>>(new Map());
@@ -22,8 +17,12 @@ export const usePeerConnection = () => {
     return true;
   };
 
-  const createPeer = useCallback(() =>
-    new Peer(ID, {
+  const createPeer = useCallback(() => {
+    const id = humanId({
+      separator: '-',
+      capitalize: false,
+    });
+    return new Peer(id, {
       config: {
         iceServers: [
           { urls: 'stun:stun.l.google.com:19302' },
@@ -31,7 +30,8 @@ export const usePeerConnection = () => {
         ],
       },
       debug: 3,
-    }), []);
+    });
+  }, []);
 
   const createRoom = useCallback(
     (
