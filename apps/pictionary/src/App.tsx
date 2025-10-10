@@ -83,7 +83,7 @@ const App = () => {
             isReady: true,
           });
         }
-        setPhase('lobby');
+        setGamePhase('lobby');
       },
       peerId => {
         console.debug('Player connected:', peerId);

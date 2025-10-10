@@ -1,5 +1,5 @@
-@import "tailwindcss";
-@import "tw-animate-css";
+@import 'tailwindcss';
+@import 'tw-animate-css';
 
 @custom-variant dark (&:is(.dark *));
 
@@ -64,7 +64,7 @@ h1 {
   line-height: 1.1;
 }
 
-button:not([data-slot="button"]) {
+button:not([data-slot='button']) {
   border-radius: 8px;
   border: 1px solid transparent;
   padding: 0.6em 1.2em;
@@ -75,11 +75,11 @@ button:not([data-slot="button"]) {
   cursor: pointer;
   transition: border-color 0.25s;
 }
-button:not([data-slot="button"]):hover {
+button:not([data-slot='button']):hover {
   border-color: #646cff;
 }
-button:not([data-slot="button"]):focus,
-button:not([data-slot="button"]):focus-visible {
+button:not([data-slot='button']):focus,
+button:not([data-slot='button']):focus-visible {
   outline: 4px auto -webkit-focus-ring-color;
 }
 
@@ -159,7 +159,7 @@ button:not([data-slot="button"]):focus-visible {
   body {
     @apply text-foreground m-0 p-0;
     background: transparent;
-    font-family: "Arial", sans-serif;
+    font-family: 'Arial', sans-serif;
   }
   html {
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
@@ -212,7 +212,7 @@ button:not([data-slot="button"]):focus-visible {
     @apply flex items-center gap-2 cursor-pointer p-2 px-3 rounded-lg bg-white/10 transition-all duration-200 hover:bg-white/20 hover:-translate-y-0.5;
   }
 
-  .setting-item input[type="checkbox"] {
+  .setting-item input[type='checkbox'] {
     @apply w-4 h-4 cursor-pointer;
   }
 
@@ -225,7 +225,7 @@ button:not([data-slot="button"]):focus-visible {
   }
 
   .waiting {
-    @apply text-center mt-12;
+    @apply text-center mt-12 flex flex-col items-center gap-6;
     animation: fadeInUp 0.8s ease;
   }
 
