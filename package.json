@@ -10,7 +10,7 @@
     "build": "nx build guess-who && nx build main-site",
     "build:main": "nx build main-site",
     "build:guess-who": "nx build guess-who",
-    "preview:main": "nx preview main-site", 
+    "preview:main": "nx preview main-site",
     "preview:guess-who": "nx preview guess-who",
     "lint": "nx run-many -t lint",
     "lint:main": "nx lint main-site",
@@ -32,6 +32,7 @@
     "react": "^19.1.1",
     "react-dom": "^19.1.1",
     "react-qr-code": "^2.0.18",
+    "simple-icons": "^15.16.1",
     "tailwind-merge": "^3.3.1",
     "tailwindcss": "^4.1.13"
   },
