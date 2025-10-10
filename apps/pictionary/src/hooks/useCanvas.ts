@@ -104,12 +104,18 @@ export const useCanvas = (
   }, [onDrawingEvent]);
 
   const replayEvent = useCallback((event: DrawingEvent) => {
-    if (event.type === 'clear') {
-      const ctx = getContext();
-      if (!ctx || !canvasRef.current) return;
-      ctx.clearRect(0, 0, canvasRef.current.width, canvasRef.current.height);
-    } else if (event.type === 'stroke' && event.points && event.color && event.brushSize) {
-      drawLine(event.points, event.color, event.brushSize);
+    switch (event.type) {
+      case 'clear': {
+        const ctx = getContext();
+        if (!ctx || !canvasRef.current) return;
+        ctx.clearRect(0, 0, canvasRef.current.width, canvasRef.current.height);
+        break;
+      }
+      case 'stroke':
+        if (event.points && event.color && event.brushSize) {
+          drawLine(event.points, event.color, event.brushSize);
+        }
+        break;
     }
   }, [getContext, drawLine]);
 

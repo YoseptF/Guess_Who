@@ -145,19 +145,25 @@ const App = () => {
         });
       },
       (data, peerId) => {
-        if (data.type === 'playerJoined') {
-          addPlayer(data.player);
-          broadcast(data);
-        } else if (data.type === 'playerReady') {
-          setPlayerReady(data.playerId, data.isReady);
-          broadcast(data);
-        } else if (data.type === 'drawing') {
-          addDrawingEvent(data.event);
-          broadcast(data);
-        } else if (data.type === 'guess') {
-          processGuess(data.playerId, data.guess);
-        } else {
-          handlePeerData(data, peerId);
+        switch (data.type) {
+          case 'playerJoined':
+            addPlayer(data.player);
+            broadcast(data);
+            break;
+          case 'playerReady':
+            setPlayerReady(data.playerId, data.isReady);
+            broadcast(data);
+            break;
+          case 'drawing':
+            addDrawingEvent(data.event);
+            broadcast(data);
+            break;
+          case 'guess':
+            processGuess(data.playerId, data.guess);
+            break;
+          default:
+            handlePeerData(data, peerId);
+            break;
         }
       },
       (peerId) => {
@@ -219,25 +225,31 @@ const App = () => {
           handlePeerData(data);
         }
 
-        if (data.type === 'startRound') {
-          setGamePhase('drawing');
-          startTimer();
-        } else if (data.type === 'drawing') {
-          addDrawingEvent(data.event);
-        } else if (data.type === 'updateScores') {
-          updateScores(data.scores);
-        } else if (
-          data.type === 'correctGuess' ||
-          data.type === 'roundTimeout'
-        ) {
-          setGamePhase('roundEnd');
-          stopTimer();
-        } else if (data.type === 'showScoreboard') {
-          setGamePhase('scoreboard');
-        } else if (data.type === 'continueGame') {
-          setGamePhase('lobby');
-        } else if (data.type === 'gameEnd') {
-          setGamePhase('menu');
+        switch (data.type) {
+          case 'startRound':
+            setGamePhase('drawing');
+            startTimer();
+            break;
+          case 'drawing':
+            addDrawingEvent(data.event);
+            break;
+          case 'updateScores':
+            updateScores(data.scores);
+            break;
+          case 'correctGuess':
+          case 'roundTimeout':
+            setGamePhase('roundEnd');
+            stopTimer();
+            break;
+          case 'showScoreboard':
+            setGamePhase('scoreboard');
+            break;
+          case 'continueGame':
+            setGamePhase('lobby');
+            break;
+          case 'gameEnd':
+            setGamePhase('menu');
+            break;
         }
       },
       () => {
