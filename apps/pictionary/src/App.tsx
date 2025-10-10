@@ -75,15 +75,11 @@ const App = () => {
 
   const processGuess = useCallback((playerId: string, guess: string) => {
     const currentState = gameStateRef.current;
-    console.debug('Guess received:', guess);
-    console.debug('Current word:', currentState.currentWord);
-    console.debug('Match:', guess === currentState.currentWord?.toLowerCase());
 
     if (
       currentState.currentWord &&
       guess === currentState.currentWord.toLowerCase()
     ) {
-      console.debug('CORRECT GUESS! Processing...');
       stopTimer();
 
       const newScores = Object.fromEntries(

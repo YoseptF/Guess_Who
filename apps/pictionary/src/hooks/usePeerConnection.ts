@@ -41,22 +41,17 @@ export const usePeerConnection = () => {
       onDisconnect: (peerId: string) => void,
       onError: (error: Error) => void,
     ) => {
-      console.debug('Creating room...');
-
       const peer = createPeer();
       peerRef.current = peer;
 
       peer.on('open', id => {
-        console.debug('Room created with ID:', id);
         onRoomCreated(id);
       });
 
       peer.on('connection', conn => {
-        console.debug('Incoming connection from:', conn.peer);
         connectionsRef.current.set(conn.peer, conn);
 
         conn.on('data', data => {
-          console.debug('Host received data from', conn.peer, ':', data);
           try {
             if (assertPeerData(data)) {
               onDataReceived(data, conn.peer);
@@ -67,12 +62,10 @@ export const usePeerConnection = () => {
         });
 
         conn.on('open', () => {
-          console.debug('Connection opened with guest:', conn.peer);
           onConnectionEstablished(conn.peer);
         });
 
         conn.on('close', () => {
-          console.debug('Guest disconnected:', conn.peer);
           connectionsRef.current.delete(conn.peer);
           onDisconnect(conn.peer);
         });
@@ -99,20 +92,14 @@ export const usePeerConnection = () => {
       onDisconnect: () => void,
       onError: (error: Error) => void,
     ) => {
-      console.debug('Joining room:', roomCode);
-
       const peer = createPeer();
       peerRef.current = peer;
 
       peer.on('open', id => {
-        console.debug('My peer ID:', id);
-        console.debug('Connecting to host:', roomCode);
-
         const conn = peer.connect(roomCode);
         connectionsRef.current.set(roomCode, conn);
 
         conn.on('data', data => {
-          console.debug('Guest received data:', data);
           try {
             if (assertPeerData(data)) {
               onDataReceived(data);
@@ -123,7 +110,6 @@ export const usePeerConnection = () => {
         });
 
         conn.on('open', () => {
-          console.debug('Connected to host!');
           onConnected();
         });
 
@@ -133,7 +119,6 @@ export const usePeerConnection = () => {
         });
 
         conn.on('close', () => {
-          console.debug('Disconnected from host');
           connectionsRef.current.delete(roomCode);
           onDisconnect();
         });

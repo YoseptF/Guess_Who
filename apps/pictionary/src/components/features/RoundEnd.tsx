@@ -21,7 +21,7 @@ const RoundEnd = ({ isSuccess, word, winner, drawings }: RoundEndProps) => {
 
   useEffect(() => {
     const audio = new Audio(isSuccess ? '/sounds/success.mp3' : '/sounds/failure.mp3');
-    audio.play().catch(err => console.debug('Audio play failed:', err));
+    audio.play().catch(() => {});
   }, [isSuccess]);
 
   return (

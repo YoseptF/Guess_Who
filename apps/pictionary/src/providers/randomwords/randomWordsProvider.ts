@@ -12,7 +12,6 @@ export class RandomWordsApiProvider implements WordProvider {
         const response = await fetch(`https://random-words-api.vercel.app/${wordType}`);
 
         if (!response.ok) {
-          console.debug(`Failed to fetch word ${i + 1} from Random Words API`);
           continue;
         }
 

@@ -10,7 +10,6 @@ export class HerokuWordProvider implements WordProvider {
       );
 
       if (!response.ok) {
-        console.debug('Failed to fetch from Heroku API');
         return this.getFallbackWords(count);
       }
 

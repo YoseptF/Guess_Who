@@ -11,7 +11,6 @@ export class KushApiProvider implements WordProvider {
       );
 
       if (!response.ok) {
-        console.debug('Failed to fetch from Kush API');
         return this.getFallbackWords(count);
       }
 

@@ -127,8 +127,6 @@ export const useGameState = () => {
   }, [gameState.players]);
 
   const handlePeerData = useCallback((data: PictionaryPeerData, peerId?: string): boolean => {
-    console.debug('Processing peer data:', data.type);
-
     switch (data.type) {
       case 'playerJoined':
         addPlayer(data.player);
