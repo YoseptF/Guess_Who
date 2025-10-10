@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState, useCallback, useRef } from 'react';
 import type { GamePhase, Player } from './types';
 import Menu from './components/features/Menu';
 import Lobby from './components/features/Lobby';
@@ -20,6 +20,7 @@ const App = () => {
   const [isHost, setIsHost] = useState(false);
   const [isJoining, setIsJoining] = useState(false);
   const [myId, setMyId] = useState('');
+  const playersRef = useRef<Map<string, Player>>(new Map());
 
   const { timerDuration, getEnabledProviders } = useSettings();
   const { fetchWord } = useWordProviders();
@@ -40,6 +41,10 @@ const App = () => {
     handlePeerData,
   } = useGameState();
 
+  useEffect(() => {
+    playersRef.current = gameState.players;
+  }, [gameState.players]);
+
   const { createRoom, joinRoom, broadcast, sendTo, cleanup, getMyId } =
     usePeerConnection();
 
@@ -56,8 +61,12 @@ const App = () => {
     }, 3000);
   }, [isHost, broadcast, gameState.currentWord, endRound, showScoreboard]);
 
-  const { timeRemaining, start: startTimer, stop: stopTimer, reset: resetTimer } =
-    useTimer(timerDuration, handleTimeout);
+  const {
+    timeRemaining,
+    start: startTimer,
+    stop: stopTimer,
+    reset: resetTimer,
+  } = useTimer(timerDuration, handleTimeout);
 
   useEffect(() => {
     const code = getRoomCodeFromUrl();
@@ -68,7 +77,7 @@ const App = () => {
 
   const handleCreateRoom = useCallback(() => {
     createRoom(
-      code => {
+      (code) => {
         setRoomCode(code);
         setIsHost(true);
         const id = getMyId();
@@ -84,13 +93,13 @@ const App = () => {
         }
         setGamePhase('lobby');
       },
-      peerId => {
-        console.debug('Player connected:', peerId);
+      (peerId) => {
+        const playersToSend = Object.fromEntries(
+          Array.from(playersRef.current.entries()).map(([id, p]) => [id, p]),
+        );
         sendTo(peerId, {
           type: 'allPlayers',
-          players: Object.fromEntries(
-            Array.from(gameState.players.entries()).map(([id, p]) => [id, p])
-          ),
+          players: playersToSend,
         });
       },
       (data, peerId) => {
@@ -113,11 +122,15 @@ const App = () => {
                 if (id === data.playerId) score += 10;
                 if (id === gameState.currentDrawerId) score += 5;
                 return [id, score];
-              })
+              }),
             );
 
             broadcast({ type: 'updateScores', scores: newScores });
-            broadcast({ type: 'correctGuess', playerId: data.playerId, word: gameState.currentWord });
+            broadcast({
+              type: 'correctGuess',
+              playerId: data.playerId,
+              word: gameState.currentWord,
+            });
 
             updateScores(newScores);
             endRound(data.playerId);
@@ -132,20 +145,18 @@ const App = () => {
           handlePeerData(data, peerId);
         }
       },
-      peerId => {
-        console.debug('Player disconnected:', peerId);
+      (peerId) => {
         removePlayer(peerId);
       },
-      err => {
+      (err) => {
         console.error('Connection error:', err);
-      }
+      },
     );
   }, [
     createRoom,
     getMyId,
     addPlayer,
     sendTo,
-    gameState.players,
     gameState.currentWord,
     gameState.currentDrawerId,
     broadcast,
@@ -168,27 +179,44 @@ const App = () => {
         const id = getMyId();
         if (id) {
           setMyId(id);
-          const newPlayer: Player = {
-            id,
-            name: `Player ${id.substring(0, 4)}`,
-            score: 0,
-            drawCount: 0,
-            isReady: false,
-          };
-          addPlayer(newPlayer);
-          broadcast({ type: 'playerJoined', player: newPlayer });
         }
         setGamePhase('lobby');
       },
-      data => {
-        handlePeerData(data);
+      (data) => {
+        if (data.type === 'allPlayers') {
+          const id = getMyId();
+          if (id) {
+            const newPlayer: Player = {
+              id,
+              name: `Player ${id.substring(0, 4)}`,
+              score: 0,
+              drawCount: 0,
+              isReady: false,
+            };
+
+            const allPlayers = new Map(Object.entries(data.players));
+            allPlayers.set(id, newPlayer);
+
+            handlePeerData({
+              type: 'allPlayers',
+              players: Object.fromEntries(allPlayers.entries()),
+            });
+
+            broadcast({ type: 'playerJoined', player: newPlayer });
+          }
+        } else {
+          handlePeerData(data);
+        }
 
         if (data.type === 'startRound') {
           setGamePhase('drawing');
           startTimer();
         } else if (data.type === 'drawing') {
           addDrawingEvent(data.event);
-        } else if (data.type === 'correctGuess' || data.type === 'roundTimeout') {
+        } else if (
+          data.type === 'correctGuess' ||
+          data.type === 'roundTimeout'
+        ) {
           setGamePhase('roundEnd');
           stopTimer();
         } else if (data.type === 'showScoreboard') {
@@ -200,13 +228,12 @@ const App = () => {
         }
       },
       () => {
-        console.debug('Disconnected from room');
         setGamePhase('menu');
       },
-      err => {
+      (err) => {
         console.error('Join error:', err);
         setIsJoining(false);
-      }
+      },
     );
   }, [
     inputCode,
@@ -262,18 +289,18 @@ const App = () => {
   ]);
 
   const handleDrawingEvent = useCallback(
-    (event: typeof gameState.drawings[number]) => {
+    (event: (typeof gameState.drawings)[number]) => {
       addDrawingEvent(event);
       broadcast({ type: 'drawing', event });
     },
-    [addDrawingEvent, broadcast]
+    [addDrawingEvent, broadcast],
   );
 
   const handleGuess = useCallback(
     (guess: string) => {
       broadcast({ type: 'guess', playerId: myId, guess });
     },
-    [broadcast, myId]
+    [broadcast, myId],
   );
 
   const handleContinue = useCallback(() => {
