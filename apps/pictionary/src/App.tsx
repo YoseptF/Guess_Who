@@ -38,7 +38,6 @@ const App = () => {
     incrementDrawCount,
     selectNextDrawer,
     handlePeerData,
-    setPhase,
   } = useGameState();
 
   const { createRoom, joinRoom, broadcast, sendTo, cleanup, getMyId } =
@@ -49,13 +48,13 @@ const App = () => {
 
     broadcast({ type: 'roundTimeout', word: gameState.currentWord || '' });
     endRound(null);
-    setPhase('roundEnd');
+    setGamePhase('roundEnd');
 
     setTimeout(() => {
       broadcast({ type: 'showScoreboard' });
       showScoreboard();
     }, 3000);
-  }, [isHost, broadcast, gameState.currentWord, endRound, setPhase, showScoreboard]);
+  }, [isHost, broadcast, gameState.currentWord, endRound, showScoreboard]);
 
   const { timeRemaining, start: startTimer, stop: stopTimer, reset: resetTimer } =
     useTimer(timerDuration, handleTimeout);
@@ -122,7 +121,7 @@ const App = () => {
 
             updateScores(newScores);
             endRound(data.playerId);
-            setPhase('roundEnd');
+            setGamePhase('roundEnd');
 
             setTimeout(() => {
               broadcast({ type: 'showScoreboard' });
@@ -145,7 +144,6 @@ const App = () => {
     createRoom,
     getMyId,
     addPlayer,
-    setPhase,
     sendTo,
     gameState.players,
     gameState.currentWord,
@@ -180,22 +178,30 @@ const App = () => {
           addPlayer(newPlayer);
           broadcast({ type: 'playerJoined', player: newPlayer });
         }
-        setPhase('lobby');
+        setGamePhase('lobby');
       },
       data => {
         handlePeerData(data);
 
         if (data.type === 'startRound') {
+          setGamePhase('drawing');
           startTimer();
         } else if (data.type === 'drawing') {
           addDrawingEvent(data.event);
         } else if (data.type === 'correctGuess' || data.type === 'roundTimeout') {
+          setGamePhase('roundEnd');
           stopTimer();
+        } else if (data.type === 'showScoreboard') {
+          setGamePhase('scoreboard');
+        } else if (data.type === 'continueGame') {
+          setGamePhase('lobby');
+        } else if (data.type === 'gameEnd') {
+          setGamePhase('menu');
         }
       },
       () => {
         console.debug('Disconnected from room');
-        setPhase('menu');
+        setGamePhase('menu');
       },
       err => {
         console.error('Join error:', err);
@@ -208,7 +214,6 @@ const App = () => {
     getMyId,
     addPlayer,
     broadcast,
-    setPhase,
     handlePeerData,
     startTimer,
     addDrawingEvent,
@@ -242,7 +247,7 @@ const App = () => {
 
     startRound(drawerId, word, timerDuration);
     resetTimer(timerDuration);
-    setPhase('drawing');
+    setGamePhase('drawing');
     startTimer();
   }, [
     selectNextDrawer,
@@ -253,7 +258,6 @@ const App = () => {
     startRound,
     timerDuration,
     resetTimer,
-    setPhase,
     startTimer,
   ]);
 
@@ -274,14 +278,14 @@ const App = () => {
 
   const handleContinue = useCallback(() => {
     broadcast({ type: 'continueGame' });
-    setPhase('lobby');
+    setGamePhase('lobby');
     handleStartGame();
-  }, [broadcast, setPhase, handleStartGame]);
+  }, [broadcast, handleStartGame]);
 
   const handleFinish = useCallback(() => {
     broadcast({ type: 'gameEnd' });
-    setPhase('menu');
-  }, [broadcast, setPhase]);
+    setGamePhase('menu');
+  }, [broadcast]);
 
   useEffect(() => cleanup, [cleanup]);
 
