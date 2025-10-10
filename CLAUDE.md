@@ -142,12 +142,52 @@ The game follows a clean separation of concerns:
 
 ## Deployment
 
-The project uses Netlify for deployment with separate builds:
+The project uses Cloudflare Pages for deployment with separate builds and automatic deployments:
+
+### Cloudflare Pages Projects
 
 - **Main site**: `games.yosept.me` (deploys `main-site` app)
-- **Guess Who**: `guesswho.yosept.me` (deploys `guess-who` app)
+  - Project name: `main-site-games`
+  - Build command: `bunx nx build main-site`
+  - Build output: `dist/apps/main-site`
+  - Build watch paths:
+    - Include: `apps/main-site/*, libs/*`
+    - Exclude: `[]`
 
-Build commands use `bunx nx build [app-name]` with Node 18.
+- **Guess Who**: `guesswho.yosept.me` (deploys `guess-who` app)
+  - Project name: `guess-who-game`
+  - Build command: `bunx nx build guess-who`
+  - Build output: `dist/apps/guess-who`
+  - Build watch paths:
+    - Include: `apps/guess-who/*, libs/*`
+    - Exclude: `[]`
+
+### Automatic Deployment Behavior
+
+Both projects connect to the same GitHub repository on the `main` branch. Cloudflare Pages uses **Build Watch Paths** to conditionally deploy:
+
+- Changes to `apps/guess-who/**` → Only `guess-who` rebuilds
+- Changes to `apps/main-site/**` → Only `main-site` rebuilds
+- Changes to `libs/**` → Both projects rebuild (shared dependencies)
+- Changes to both apps → Both projects rebuild
+
+### Manual Deployment
+
+Use the deployment script for manual deployments:
+
+```bash
+# Deploy main-site
+./scripts/deploy.sh main-site
+
+# Deploy guess-who
+./scripts/deploy.sh guess-who
+```
+
+Requirements:
+- Environment variables: `CLOUDFLARE_API_TOKEN`, `CLOUDFLARE_ACCOUNT_ID`
+- Wrangler CLI: `npm install -g wrangler`
+
+Build commands use `bunx nx build [app-name]` with Node 22.
 
 ## Important Notes
 
