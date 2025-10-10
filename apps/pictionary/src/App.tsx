@@ -62,6 +62,7 @@ const App = () => {
     setTimeout(() => {
       broadcast({ type: 'showScoreboard' });
       showScoreboard();
+      setGamePhase('scoreboard');
     }, 3000);
   }, [isHost, broadcast, endRound, showScoreboard]);
 
@@ -108,6 +109,7 @@ const App = () => {
       setTimeout(() => {
         broadcast({ type: 'showScoreboard' });
         showScoreboard();
+        setGamePhase('scoreboard');
       }, 3000);
     }
   }, [stopTimer, broadcast, updateScores, endRound, showScoreboard]);
