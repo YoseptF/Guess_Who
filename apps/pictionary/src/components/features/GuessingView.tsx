@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Canvas, Timer, Input, Button } from 'shared-ui';
 import { useCanvas } from '../../hooks/useCanvas';
 import type { DrawingEvent } from '../../types';
@@ -16,11 +16,14 @@ const GuessingView = ({
 }: GuessingViewProps) => {
   const { canvasRef, replayEvent } = useCanvas(false);
   const [guess, setGuess] = useState('');
+  const lastDrawingCountRef = useRef(0);
 
   useEffect(() => {
-    if (drawings.length > 0) {
-      const latestEvent = drawings[drawings.length - 1];
-      replayEvent(latestEvent);
+    if (drawings.length > lastDrawingCountRef.current) {
+      for (let i = lastDrawingCountRef.current; i < drawings.length; i++) {
+        replayEvent(drawings[i]);
+      }
+      lastDrawingCountRef.current = drawings.length;
     }
   }, [drawings, replayEvent]);
 

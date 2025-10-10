@@ -109,6 +109,9 @@ const App = () => {
         } else if (data.type === 'playerReady') {
           setPlayerReady(data.playerId, data.isReady);
           broadcast(data);
+        } else if (data.type === 'drawing') {
+          addDrawingEvent(data.event);
+          broadcast(data);
         } else if (data.type === 'guess') {
           if (
             gameState.currentWord &&
@@ -159,8 +162,10 @@ const App = () => {
     sendTo,
     gameState.currentWord,
     gameState.currentDrawerId,
+    gameState.players,
     broadcast,
     setPlayerReady,
+    addDrawingEvent,
     stopTimer,
     updateScores,
     endRound,
