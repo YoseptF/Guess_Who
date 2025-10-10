@@ -30,7 +30,7 @@ export const App = () => {
           </div>
 
           <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-black mb-4 sm:mb-6 bg-gradient-to-r from-purple-400 via-pink-400 to-purple-400 bg-clip-text text-transparent animate-gradient px-4">
-            Games by Yoseph
+            Games by Yosept
           </h1>
 
           <p className="text-base sm:text-lg md:text-xl lg:text-2xl text-slate-300 max-w-2xl mx-auto mb-6 sm:mb-8 px-4">
