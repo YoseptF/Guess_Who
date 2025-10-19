@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Button, Input } from 'shared-ui';
 import { useSettings } from '../../contexts/SettingsContext';
 import { wordProviders } from '../../providers';
@@ -11,6 +11,8 @@ interface MenuProps {
   isJoining: boolean;
 }
 
+const PEERJS_SERVER_URL = 'https://pictionary-peerjs-server.onrender.com';
+
 const Menu = ({
   inputCode,
   onInputCodeChange,
@@ -20,10 +22,76 @@ const Menu = ({
 }: MenuProps) => {
   const { wordProviderSettings, updateWordProvider, timerDuration, setTimerDuration } = useSettings();
   const [showSettings, setShowSettings] = useState(false);
+  const [serverStatus, setServerStatus] = useState<'checking' | 'online' | 'waking' | 'error'>('checking');
+
+  useEffect(() => {
+    const checkServerStatus = async () => {
+      try {
+        const startTime = Date.now();
+        const response = await fetch(PEERJS_SERVER_URL, {
+          method: 'GET',
+          cache: 'no-cache',
+        });
+        const duration = Date.now() - startTime;
+
+        if (response.ok) {
+          if (duration > 5000) {
+            setServerStatus('waking');
+            setTimeout(() => setServerStatus('online'), 2000);
+          } else {
+            setServerStatus('online');
+          }
+        } else {
+          setServerStatus('error');
+        }
+      } catch (error) {
+        setServerStatus('waking');
+        setTimeout(() => {
+          checkServerStatus();
+        }, 3000);
+      }
+    };
+
+    checkServerStatus();
+  }, []);
+
+  const getStatusBadge = () => {
+    switch (serverStatus) {
+      case 'checking':
+        return (
+          <div className="text-sm text-gray-300 mb-4 flex items-center gap-2">
+            <span className="inline-block w-2 h-2 bg-yellow-400 rounded-full animate-pulse" />
+            Checking server status...
+          </div>
+        );
+      case 'waking':
+        return (
+          <div className="text-sm text-yellow-300 mb-4 flex items-center gap-2">
+            <span className="inline-block w-2 h-2 bg-yellow-400 rounded-full animate-pulse" />
+            Waking up server... (30s)
+          </div>
+        );
+      case 'online':
+        return (
+          <div className="text-sm text-green-300 mb-4 flex items-center gap-2">
+            <span className="inline-block w-2 h-2 bg-green-400 rounded-full" />
+            Server ready
+          </div>
+        );
+      case 'error':
+        return (
+          <div className="text-sm text-red-300 mb-4 flex items-center gap-2">
+            <span className="inline-block w-2 h-2 bg-red-400 rounded-full" />
+            Server error - please try again
+          </div>
+        );
+    }
+  };
 
   return (
     <div className="app">
       <h1>🎨 Pictionary</h1>
+      {getStatusBadge()}
       <div className="menu">
         <Button onClick={onCreateRoom} size="lg">
           Create Room
