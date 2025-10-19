@@ -3,6 +3,10 @@
 
 @custom-variant dark (&:is(.dark *));
 
+#root {
+  width: 100%;
+}
+
 :root {
   font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
   line-height: 1.5;
@@ -174,7 +178,7 @@ button:not([data-slot='button']):focus-visible {
   }
 
   .app {
-    @apply min-h-screen flex flex-col items-center p-5 text-white;
+    @apply flex flex-col items-center p-5 text-white;
   }
 
   .app h1 {

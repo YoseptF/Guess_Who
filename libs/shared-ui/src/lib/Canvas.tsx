@@ -27,12 +27,17 @@ export const Canvas = forwardRef<HTMLCanvasElement, CanvasProps>(
         const width = canvasWidth ?? containerWidth;
         const height = canvasHeight ?? containerHeight;
 
-        if (dimensionsRef.current.width === width && dimensionsRef.current.height === height) {
+        if (
+          dimensionsRef.current.width === width &&
+          dimensionsRef.current.height === height
+        ) {
           return;
         }
 
         if (canvas.width > 0 && canvas.height > 0) {
-          const imageData = canvas.getContext('2d')?.getImageData(0, 0, canvas.width, canvas.height);
+          const imageData = canvas
+            .getContext('2d')
+            ?.getImageData(0, 0, canvas.width, canvas.height);
 
           canvas.width = width;
           canvas.height = height;
@@ -62,13 +67,17 @@ export const Canvas = forwardRef<HTMLCanvasElement, CanvasProps>(
         ref={internalRef}
         className={cn(
           'border-2 border-white/20 rounded-lg bg-white cursor-crosshair',
-          className
+          className,
         )}
-        style={{ touchAction: 'none' }}
+        style={{
+          touchAction: 'none',
+          maxWidth: '100%',
+          maxHeight: '100%',
+        }}
         {...props}
       />
     );
-  }
+  },
 );
 
 Canvas.displayName = 'Canvas';

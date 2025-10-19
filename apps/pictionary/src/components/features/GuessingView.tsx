@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import { Canvas, Timer, Input, Button } from 'shared-ui';
 import { useCanvas } from '../../hooks/useCanvas';
 import type { DrawingEvent } from '../../types';
+import { VisualViewport } from './VisualViewport';
 
 interface GuessingViewProps {
   timeRemaining: number;
@@ -29,27 +30,31 @@ const GuessingView = ({
     }
   }, [drawings, replayEvent]);
 
-  useEffect(() => {
-    const handleResize = () => {
-      const viewportHeight = window.visualViewport?.height ?? window.innerHeight;
-      const windowHeight = window.innerHeight;
+  // useEffect(() => {
+  //   const handleResize = () => {
+  //     const viewportHeight =
+  //       window.visualViewport?.height ?? window.innerHeight;
+  //     const windowHeight = window.innerHeight;
 
-      const keyboardVisible = viewportHeight < windowHeight * 0.75;
-      setIsKeyboardVisible(keyboardVisible);
+  //     const keyboardVisible = viewportHeight < windowHeight * 0.75;
+  //     setIsKeyboardVisible(keyboardVisible);
 
-      if (keyboardVisible && canvasContainerRef.current) {
-        canvasContainerRef.current.scrollIntoView({ behavior: 'smooth', block: 'center' });
-      }
-    };
+  //     if (keyboardVisible && canvasContainerRef.current) {
+  //       canvasContainerRef.current.scrollIntoView({
+  //         behavior: 'smooth',
+  //         block: 'center',
+  //       });
+  //     }
+  //   };
 
-    window.visualViewport?.addEventListener('resize', handleResize);
-    window.addEventListener('resize', handleResize);
+  //   window.visualViewport?.addEventListener('resize', handleResize);
+  //   window.addEventListener('resize', handleResize);
 
-    return () => {
-      window.visualViewport?.removeEventListener('resize', handleResize);
-      window.removeEventListener('resize', handleResize);
-    };
-  }, []);
+  //   return () => {
+  //     window.visualViewport?.removeEventListener('resize', handleResize);
+  //     window.removeEventListener('resize', handleResize);
+  //   };
+  // }, []);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -60,43 +65,46 @@ const GuessingView = ({
   };
 
   return (
-    <div
-      className="app h-screen flex flex-col w-full"
+    <VisualViewport
+      className="flex flex-col bg-red-300 h-full"
       style={{
         touchAction: 'none',
-        overflow: isKeyboardVisible ? 'auto' : 'hidden'
       }}
     >
-      <div className="flex flex-col items-center gap-3 p-3 bg-gradient-to-b from-purple-900 to-purple-900/95 w-full">
-        <div className="flex items-center justify-between w-full max-w-4xl flex-wrap gap-2">
-          <div className="text-xl md:text-3xl font-bold text-white bg-white/20 px-3 md:px-8 py-2 md:py-4 rounded-xl backdrop-blur-sm">
-            Guess the word!
-          </div>
-          <Timer timeRemaining={timeRemaining} />
+      <div className="flex items-center justify-between gap-2 border-4 border-b-black">
+        <div className="text-lg font-bold text-white bg-purple-900/90 px-3 py-1 rounded-lg backdrop-blur-sm shadow-lg">
+          Guess the word!
         </div>
+        <Timer timeRemaining={timeRemaining} />
       </div>
-
       <div
         ref={canvasContainerRef}
-        className="flex-1 flex items-center justify-center overflow-hidden w-full"
+        className="w-full flex items-center justify-center  bg-red-100 border-4 border-b-black"
+        style={{
+          height: `calc(100% - ${isKeyboardVisible ? '300px' : '155px'})`,
+          transition: 'height 150ms ease',
+        }}
       >
         <Canvas ref={canvasRef} className="pointer-events-none" />
       </div>
-
-      <form onSubmit={handleSubmit} className="flex gap-3 p-4 bg-gradient-to-t from-purple-900 to-purple-900/95">
+      {window.innerHeight}
+      <form
+        onSubmit={handleSubmit}
+        className="flex gap-2 border-4 border-b-black"
+      >
         <Input
           type="text"
           value={guess}
-          onChange={e => setGuess(e.target.value)}
+          onChange={(e) => setGuess(e.target.value)}
           placeholder="Type your guess..."
-          className="flex-1 text-base md:text-lg p-3 md:p-4"
+          className="flex-1 text-sm p-2 md:p-4 bg-white/95 backdrop-blur-sm"
           autoFocus
         />
-        <Button type="submit" size="lg">
+        <Button type="submit" size="sm" className="px-4 shadow-lg">
           Guess
         </Button>
       </form>
-    </div>
+    </VisualViewport>
   );
 };
 
